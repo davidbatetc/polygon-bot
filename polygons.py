@@ -1,4 +1,5 @@
 import math
+import random
 from PIL import Image, ImageDraw
 
 
@@ -88,6 +89,11 @@ class Point:
             return Orien.cw
         if gt(cross, 0, tol):
             return Orien.ccw
+
+    @staticmethod
+    def random(xdom=(0, 1), ydom=(0, 1)):
+        return Point(xdom[0] + random.random()*(xdom[1] - xdom[0]),
+                     ydom[0] + random.random()*(ydom[1] - ydom[0]))
 
 
 class Vector:
@@ -196,8 +202,8 @@ class ConvexPolygon:
     # Constructor of the class
     def __init__(self, points=[], color=Color(), tol=1e-9):
         self.points = points
-        self.tol = tol
         self.color = color
+        self.tol = tol
 
     # This is the method that the function `print()` uses
     def __repr__(self):
@@ -286,12 +292,12 @@ class ConvexPolygon:
             return ConvexPolygon([], color=color, tol=tol)
 
         def initialComp(p, q):
-            return lt(p.y, q.y, tol) or (eq(p.y, q.y, tol) and lt(p.x, q.x, tol))
+            return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
 
         p0 = minWithComp(points, comp=initialComp)
 
         def swipeAngle(p):
-            return (p0.y - p.y)/(p - p0).norm()
+            return (p.y - p0.y)/(p - p0).norm()
 
         spoints = [p for p in points if p != p0]
         spoints.sort(key=swipeAngle)
@@ -312,7 +318,7 @@ class ConvexPolygon:
                     p = spoints[iter + 1]
                 iter = iter + 1
 
-            while len(stack) >= 2 and Point.orientation(stack[-1], stack[-2], p) != Orien.ccw:
+            while len(stack) >= 2 and Point.orientation(stack[-1], stack[-2], p) != Orien.cw:
                 stack.pop()
 
             stack.append(p)
@@ -320,9 +326,14 @@ class ConvexPolygon:
 
         return ConvexPolygon(points=[p0] + stack, color=color, tol=tol)
 
+    @staticmethod
+    def random(n, xdom=(0, 1), ydom=(0, 1), color=Color(), tol=1e-9):
+        points = [Point.random(xdom=xdom, ydom=ydom) for _ in range(0, n)]
+        return ConvexPolygon.convexHull(points, color=color, tol=tol)
+
     # Fix list order. Most rightern point should be the first
     @staticmethod
-    def genRegularPolygon(n=0, r=1, c=Point(0, 0), phase=0, color=Color(0, 0, 0)):
+    def genRegularPolygon(n=0, r=1, c=Point(0, 0), phase=0, color=Color()):
         if n == 0:
             return ConvexPolygon([], color=color)
         if n == 1:
@@ -423,7 +434,7 @@ class ConvexPolygon:
             factor = (sideLength - 2*margin)/xspan
 
         def fitToCanvas(tupleList):
-            return [((x - x0)*factor + margin, (y - y0)*factor + margin) for (x, y) in tupleList]
+            return [((x - x0)*factor + margin, sideLength - (y - y0)*factor - margin) for (x, y) in tupleList]
 
         for poly in polys:
             dib.polygon(fitToCanvas(poly.toTupleList()), outline=poly.color.toIntegerTuple())
