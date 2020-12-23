@@ -1,9 +1,10 @@
 import math
+from PIL import Image, ImageDraw
 
 
-# Zips xs and ys with ys starting by the `phase`-th element
-def phasedZip(xs, ys, phase):
-    return zip(xs, ys[phase:] + ys[0:phase])
+# Zips xs and ys with ys starting by the `shift`-th element
+def shiftZip(xs, ys, shift):
+    return zip(xs, ys[shift:] + ys[0:shift])
 
 
 def sign(x, tol=1e-9):
@@ -15,18 +16,11 @@ def sign(x, tol=1e-9):
         return 1
 
 
-def maxNindex(xs, comp=lambda x, y: x <= y):
-    if not xs:
-        return None
-
-    maxNum = xs[0]
-    maxIndex = 0
-    for i in range(1, len(xs)):
-        if not comp(xs[i], maxNum):
-            maxNum = xs[i]
-            maxIndex = i
-
-    return maxNum, maxIndex
+def cycle(xs):
+    n = len(xs)
+    while True:
+        for i in range(0, n):
+            yield xs[i]
 
 
 class Point:
@@ -37,10 +31,13 @@ class Point:
 
     # This is the method that the function `print()` uses
     def __repr__(self):
-        return "({:.2f}, {:.2f})".format(self.x, self.y)
+        return '({:.2f}, {:.2f})'.format(self.x, self.y)
 
     def __sub__(self, q):
         return Vector(self.x - q.x, self.y - q.y)
+
+    def toTuple(self):
+        return self.x, self.y
 
     @staticmethod
     def distance(p, q):
@@ -60,22 +57,26 @@ class Point:
     #  3. If `orientationValue` is zero, the triangle is degenerate.
     @staticmethod
     def orientation(p1, p2, p3, tol=1e-9):
-        val = (p2.x - p1.x)*(p3.y - p1.y) - (p2.y - p1.y)*(p3.x - p1.x)
-        if abs(val) < tol:
+        cross = Vector.crossProductZ(p2 - p1, p3 - p1)
+        if abs(cross) < tol:
             return Orien.degen
-        if val < 0:
+        if cross < 0:
             return Orien.cw
-        if val > 0:
+        if cross > 0:
             return Orien.ccw
 
 
 class Vector:
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
+        if isinstance(x, Point) and isinstance(y, Point):
+            self.x = y.x - x.x
+            self.y = y.y - x.y
+        else:
+            self.x = x
+            self.y = y
 
     def __repr__(self):
-        return "({:.2f}, {:.2f})".format(self.x, self.y)
+        return '({:.2f}, {:.2f})'.format(self.x, self.y)
 
     def norm(self):
         return math.sqrt(self.x**2 + self.y**2)
@@ -83,6 +84,10 @@ class Vector:
     @staticmethod
     def dotProduct(u, v):
         return u.x*v.x + u.y*v.y
+
+    @staticmethod
+    def crossProductZ(u, v):
+        return u.x*v.y - u.y*v.x
 
     # Note that this will return the smaller angle in radians. The other angle
     #  can be obtained with `math.pi - computeAngle(u, v)`.
@@ -104,10 +109,15 @@ class Edge:
         self.q = q
 
     def __repr__(self):
-        return "{:} --> {:}".format(self.p, self.q)
+        return '{:} --> {:}'.format(self.p, self.q)
 
     def getLength(self):
         return Point.distance(self.p, self.q)
+
+    def isInHalfPlane(self, r, tol=1e-9):
+        u = self.q - self.p
+        v = r - self.p
+        return Vector.dotProduct(u, v) > -tol
 
     @staticmethod
     def computeAngle(e1, e2):
@@ -148,11 +158,22 @@ class Edge:
         return Point(px, py)
 
 
+class Color:
+    def __init__(self, r=0, g=0, b=0):
+        self.r = r
+        self.g = g
+        self.b = b
+
+    def toIntegerTuple(self):
+        return math.floor(256*self.r), math.floor(256*self.g), math.floor(256*self.b)
+
+
 class ConvexPolygon:
     # Constructor of the class
-    def __init__(self, points=[], tol=1e-9):
+    def __init__(self, points=[], color=Color(), tol=1e-9):
         self.points = points
         self.tol = tol
+        self.color = color
 
     # This is the method that the function `print()` uses
     def __repr__(self):
@@ -161,6 +182,12 @@ class ConvexPolygon:
     def getNumberOfVertices(self):
         return len(self.points)
 
+    def toTupleList(self):
+        return [p.toTuple() for p in self.points]
+
+    def translate(self, x, y):
+        self.points = [Point(p.x + x, p.y + y) for p in self.points]
+
     def isTrivial(self):
         n = self.getNumberOfVertices()
         return n == 0 or n == 1
@@ -168,7 +195,7 @@ class ConvexPolygon:
     # Checks if the given point is inside the polygon
     # TO-DO: Make it O(log n)
     def isInside(self, p):
-        for (q1, q2) in phasedZip(self.points, self.points, 1):
+        for (q1, q2) in shiftZip(self.points, self.points, 1):
             ori = Point.orientation(p, q1, q2, self.tol)
             if ori == Orien.degen:
                 return True
@@ -180,7 +207,7 @@ class ConvexPolygon:
     def getEdges(self):
         if self.isTrivial():
             return []
-        return [Edge(p, q) for (p, q) in phasedZip(self.points, self.points, 1)]
+        return [Edge(p, q) for (p, q) in shiftZip(self.points, self.points, 1)]
 
     def getPerimeter(self):
         return sum([e.getLength() for e in self.getEdges()])
@@ -198,12 +225,12 @@ class ConvexPolygon:
         def diffLength(e): return abs(expectedLength - e.getLength())
 
         return all((diffAngle(e1, e2) < self.tol and diffLength(e1) < self.tol
-                    for (e1, e2) in phasedZip(edges, edges, 1)))
+                    for (e1, e2) in shiftZip(edges, edges, 1)))
 
     def getArea(self):
         xs = [p.x for p in self.points]
-        ys = [q.y - p.y for (p, q) in phasedZip(self.points, self.points, 2)]
-        return sum([x*y for (x, y) in phasedZip(xs, ys, -1)])/2
+        ys = [q.y - p.y for (p, q) in shiftZip(self.points, self.points, 2)]
+        return sum([x*y for (x, y) in shiftZip(xs, ys, -1)])/2
 
     def getCentroid(self):
         n = self.getNumberOfVertices()
@@ -219,62 +246,128 @@ class ConvexPolygon:
             if abs(x0 - x1) < self.tol or abs(y0 - y1) < self.tol:
                 return ConvexPolygon([])
 
-        north = -math.inf
-        south = math.inf
-        east = math.inf
-        west = -math.inf
+        top = -math.inf
+        bottom = math.inf
+        left = math.inf
+        right = -math.inf
         for p in self.points:
-            north = max(north, p.y)
-            south = min(south, p.y)
-            east = min(east, p.x)
-            west = max(west, p.x)
+            top = max(top, p.y)
+            bottom = min(bottom, p.y)
+            left = min(left, p.x)
+            right = max(right, p.x)
 
-        return ConvexPolygon([Point(east, south), Point(west, south),
-                              Point(west, north), Point(east, north)])
+        return ConvexPolygon([Point(left, bottom), Point(right, bottom),
+                              Point(right, top), Point(left, top)])
 
-    # Fix list order. Most western point should be the first
+    # Fix list order. Most rightern point should be the first
     @staticmethod
-    def genRegularPolygon(n=0, r=1, c=Point(0, 0), phase=0):
+    def genRegularPolygon(n=0, r=1, c=Point(0, 0), phase=0, color=Color(0, 0, 0)):
         if n == 0:
-            return ConvexPolygon([])
+            return ConvexPolygon([], color=color)
         if n == 1:
-            return ConvexPolygon([c])
+            return ConvexPolygon([c], color=color)
         return ConvexPolygon([Point(c.x + r*math.cos(2*math.pi*k/n + phase),
-                                    c.y + r*math.sin(2*math.pi*k/n + phase)) for k in range(0, n)])
+                                    c.y + r*math.sin(2*math.pi*k/n + phase)) for k in range(0, n)], color=color)
+
+    @staticmethod
+    def boundaries(polys):
+        if not polys:
+            return None
+
+        left = math.inf
+        bottom = math.inf
+        right = -math.inf
+        top = -math.inf
+        for poly in polys:
+            for p in poly.points:
+                top = max(top, p.y)
+                bottom = min(bottom, p.y)
+                left = min(left, p.x)
+                right = max(right, p.x)
+
+        return left, bottom, right, top
 
     # Precondition: the vertices are ordered counter-clockwise
     @staticmethod
     def intersect(poly1, poly2, tol=1e-9):
-        if poly1.getNumberOfVertices() == 0 or poly2.getNumberOfVertices() == 0:
-            return ConvexPolygon([])
+        n1 = poly1.getNumberOfVertices()
+        n2 = poly2.getNumberOfVertices()
+        if n1 == 0 or n2 == 0:
+            return None
 
-        top1, topIndex1 = maxNindex(poly1.points, comp=lambda p, q: p.y <= q.y)
-        top2, topIndex2 = maxNindex(poly2.points, comp=lambda p, q: p.y <= q.y)
-        bott1, bottIndex1 = maxNindex(poly1.points, comp=lambda p, q: p.y >= q.y)
-        bott2, bottIndex2 = maxNindex(poly2.points, comp=lambda p, q: p.y >= q.y)
+        # Tbp
+        if n1 <= 2 or n2 <= 2:
+            return None
 
-        def leftRightLists(poly, topIndex, bottIndex):
-            n = poly.getNumberOfVertices()
-            leftPoints = []
-            rightPoints = []
+        gen1 = cycle(poly1.points)
+        gen2 = cycle(poly2.points)
+        e1 = Edge(next(gen1), next(gen1))
+        e2 = Edge(next(gen2), next(gen2))
+        inter = []
+        inside = None
+        iter = 0
+        while iter <= 2*(n1 + n2):
+            p = Edge.intersect(e1, e2)
+            if p != None:
+                if inter and (inter[0] - p).norm() < tol:
+                    break
+                else:
+                    inter.append(p)
+                    if e2.isInHalfPlane(e1.q):
+                        inside = 'poly1'
+                    else:
+                        inside = 'poly2'
 
-            iter = topIndex + 1
-            while iter % n != bottIndex:
-                leftPoints.append(poly.points[iter % n])
-                iter = iter + 1
+            v1 = Vector(e1.p, e1.q)
+            v2 = Vector(e2.p, e2.q)
+            cross = Vector.crossProductZ(v1, v2)
+            if cross > tol:  # Aka > 0
+                if e1.isInHalfPlane(e2.q):
+                    e1 = Edge(e1.q, next(gen1))
+                else:
+                    e2 = Edge(e2.q, next(gen2))
+            elif cross < tol:
+                if e2.isInHalfPlane(e1.q):
+                    e2 = Edge(e2.q, next(gen2))
+                else:
+                    e1 = Edge(e1.q, next(gen1))
+            else:
+                print('Oh no, we have found collinearity!')
 
-            iter = topIndex - 1
-            while iter % n != bottIndex:
-                rightPoints.append(poly.points[iter % n])
-                iter = iter - 1
+            iter = iter + 1
 
-            return leftPoints, rightPoints
+        return inter
 
-        lps1, rps1 = leftRightLists(poly1, topIndex1, bottIndex1)
-        lps2, rps2 = leftRightLists(poly2, topIndex2, bottIndex2)
+    @staticmethod
+    def draw(polys=[], fileName='output.png', sideLength=400, margin=1, bg=Color(1, 1, 1), show=False):
+        img = Image.new('RGB', (sideLength, sideLength), bg.toIntegerTuple())
+        dib = ImageDraw.Draw(img)
 
-        def advance():
-            yield top1, top2
-            il1, ir1, il2, ir2 = 0, 0, 0, 0
-            lp1, rp1, lp2, rp2 = top1, top1, top2, top2
-            while il1 < len(lps1) or ir1 < len(rps1) or il2 < len(lps2) or ir2 < len(rps2):
+        if not polys:
+            if show:
+                img.show()
+            img.save(fileName)
+            return
+
+        left, bottom, right, top = ConvexPolygon.boundaries(polys)
+        xspan = right - left
+        yspan = top - bottom
+        if xspan < yspan:
+            x0 = left - (yspan - xspan)/2
+            y0 = bottom
+            factor = (sideLength - 2*margin)/yspan
+        else:
+            x0 = left
+            y0 = bottom - (xspan - yspan)/2
+            factor = (sideLength - 2*margin)/xspan
+
+        def fitToCanvas(tupleList):
+            return [((x - x0)*factor + margin, (y - y0)*factor + margin) for (x, y) in tupleList]
+
+        for poly in polys:
+            dib.polygon(fitToCanvas(poly.toTupleList()), outline=poly.color.toIntegerTuple())
+
+        if show:
+            img.show()
+
+        img.save(fileName)

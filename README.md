@@ -13,9 +13,9 @@ The class should define, at least, the following operations:
 - [ ] Compute the intersection of two convex polygons.
 - [ ] Compute the convex union of two convex polygons.
 - [x] Compute the bounding box of a convex polygon.
-- [ ] Draw convex polygons (with colors) in a PNG image.
+- [x] Draw convex polygons (with colors) in a PNG image.
 
 
 ## Other To-dos
 - [ ] Declare static methods as actually static.
-- [ ] Fix regular polygon list order. Most western point should be the first in  the points list.
+- [ ] Fix regular polygon list order. Most western point should be the first in the points list.
