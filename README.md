@@ -18,3 +18,4 @@ The class should define, at least, the following operations:
 
 ## Other To-dos
 - [ ] Declare static methods as actually static.
+- [ ] Fix regular polygon list order. Most western point should be the first in  the points list.

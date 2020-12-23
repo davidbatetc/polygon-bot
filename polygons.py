@@ -15,6 +15,20 @@ def sign(x, tol=1e-9):
         return 1
 
 
+def maxNindex(xs, comp=lambda x, y: x <= y):
+    if not xs:
+        return None
+
+    maxNum = xs[0]
+    maxIndex = 0
+    for i in range(1, len(xs)):
+        if not comp(xs[i], maxNum):
+            maxNum = xs[i]
+            maxIndex = i
+
+    return maxNum, maxIndex
+
+
 class Point:
     # Constructor of the class
     def __init__(self, x, y):
@@ -119,6 +133,20 @@ class Edge:
         else:
             return ori1p != ori1q and ori2p != ori2q
 
+    # Fix corner cases
+    @staticmethod
+    def intersect(e1, e2, tol=1e-9):
+        if not Edge.hasIntersection(e1, e2, tol):
+            return None
+
+        den = (e1.p.x - e1.q.x)*(e2.p.y - e2.q.y) - (e1.p.y - e1.q.y)*(e2.p.x - e2.q.x)
+        a = e1.p.x*e1.q.y - e1.p.y*e1.q.x
+        b = e2.p.x*e2.q.y - e2.p.y*e2.q.x
+        px = (a*(e2.p.x - e2.q.x) - (e1.p.x - e1.q.x)*b)/den
+        py = (a*(e2.p.y - e2.q.y) - (e1.p.y - e1.q.y)*b)/den
+
+        return Point(px, py)
+
 
 class ConvexPolygon:
     # Constructor of the class
@@ -204,7 +232,8 @@ class ConvexPolygon:
         return ConvexPolygon([Point(east, south), Point(west, south),
                               Point(west, north), Point(east, north)])
 
-    @ staticmethod
+    # Fix list order. Most western point should be the first
+    @staticmethod
     def genRegularPolygon(n=0, r=1, c=Point(0, 0), phase=0):
         if n == 0:
             return ConvexPolygon([])
@@ -212,3 +241,40 @@ class ConvexPolygon:
             return ConvexPolygon([c])
         return ConvexPolygon([Point(c.x + r*math.cos(2*math.pi*k/n + phase),
                                     c.y + r*math.sin(2*math.pi*k/n + phase)) for k in range(0, n)])
+
+    # Precondition: the vertices are ordered counter-clockwise
+    @staticmethod
+    def intersect(poly1, poly2, tol=1e-9):
+        if poly1.getNumberOfVertices() == 0 or poly2.getNumberOfVertices() == 0:
+            return ConvexPolygon([])
+
+        top1, topIndex1 = maxNindex(poly1.points, comp=lambda p, q: p.y <= q.y)
+        top2, topIndex2 = maxNindex(poly2.points, comp=lambda p, q: p.y <= q.y)
+        bott1, bottIndex1 = maxNindex(poly1.points, comp=lambda p, q: p.y >= q.y)
+        bott2, bottIndex2 = maxNindex(poly2.points, comp=lambda p, q: p.y >= q.y)
+
+        def leftRightLists(poly, topIndex, bottIndex):
+            n = poly.getNumberOfVertices()
+            leftPoints = []
+            rightPoints = []
+
+            iter = topIndex + 1
+            while iter % n != bottIndex:
+                leftPoints.append(poly.points[iter % n])
+                iter = iter + 1
+
+            iter = topIndex - 1
+            while iter % n != bottIndex:
+                rightPoints.append(poly.points[iter % n])
+                iter = iter - 1
+
+            return leftPoints, rightPoints
+
+        lps1, rps1 = leftRightLists(poly1, topIndex1, bottIndex1)
+        lps2, rps2 = leftRightLists(poly2, topIndex2, bottIndex2)
+
+        def advance():
+            yield top1, top2
+            il1, ir1, il2, ir2 = 0, 0, 0, 0
+            lp1, rp1, lp2, rp2 = top1, top1, top2, top2
+            while il1 < len(lps1) or ir1 < len(rps1) or il2 < len(lps2) or ir2 < len(rps2):
