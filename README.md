@@ -2,7 +2,7 @@
 ## Part 1: Class for convex polygons
 The class should define, at least, the following operations:
 
-- [x] ?Construct a convex polygon given by the coordinates of a set of points.
+- [x] Construct a convex polygon given by the coordinates of a set of points.
 - [x] Check whether a point is inside another convex polygon.
 - [ ] Check whether a convex polygon is inside another convex polygon.
 - [x] Get the number of vertices and edges of a convex polygon.
@@ -17,5 +17,5 @@ The class should define, at least, the following operations:
 
 
 ## Other To-dos
-- [ ] Declare static methods as actually static.
+- [x] Declare static methods as actually static.
 - [ ] Fix regular polygon list order. Most western point should be the first in the points list.

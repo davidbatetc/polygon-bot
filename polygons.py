@@ -23,6 +23,30 @@ def cycle(xs):
             yield xs[i]
 
 
+def minWithComp(xs, comp=lambda x, y: x < y):
+    if not xs:
+        return None
+
+    theMin = xs[0]
+    n = len(xs)
+    for i in range(1, n):
+        if comp(xs[i], theMin):
+            theMin = xs[i]
+    return theMin
+
+
+def lt(x, y, tol):
+    return x - y < -tol
+
+
+def gt(x, y, tol):
+    return x - y > tol
+
+
+def eq(x, y, tol):
+    return abs(x - y) <= tol
+
+
 class Point:
     # Constructor of the class
     def __init__(self, x, y):
@@ -58,11 +82,11 @@ class Point:
     @staticmethod
     def orientation(p1, p2, p3, tol=1e-9):
         cross = Vector.crossProductZ(p2 - p1, p3 - p1)
-        if abs(cross) < tol:
+        if eq(cross, 0, tol):
             return Orien.degen
-        if cross < 0:
+        if lt(cross, 0, tol):
             return Orien.cw
-        if cross > 0:
+        if gt(cross, 0, tol):
             return Orien.ccw
 
 
@@ -117,7 +141,7 @@ class Edge:
     def isInHalfPlane(self, r, tol=1e-9):
         u = self.q - self.p
         v = r - self.p
-        return Vector.dotProduct(u, v) > -tol
+        return gt(Vector.crossProductZ(u, v), 0, tol)
 
     @staticmethod
     def computeAngle(e1, e2):
@@ -185,9 +209,6 @@ class ConvexPolygon:
     def toTupleList(self):
         return [p.toTuple() for p in self.points]
 
-    def translate(self, x, y):
-        self.points = [Point(p.x + x, p.y + y) for p in self.points]
-
     def isTrivial(self):
         n = self.getNumberOfVertices()
         return n == 0 or n == 1
@@ -224,7 +245,7 @@ class ConvexPolygon:
         def diffAngle(e1, e2): return abs(expectedAngle - Edge.computeAngle(e1, e2))
         def diffLength(e): return abs(expectedLength - e.getLength())
 
-        return all((diffAngle(e1, e2) < self.tol and diffLength(e1) < self.tol
+        return all((eq(diffAngle(e1, e2), 0, self.tol) and eq(diffLength(e1), 0, self.tol)
                     for (e1, e2) in shiftZip(edges, edges, 1)))
 
     def getArea(self):
@@ -243,7 +264,7 @@ class ConvexPolygon:
             # Defined for readibility
             x0, y0 = self.points[0].x, self.points[0].y
             x1, y1 = self.points[1].x, self.points[1].y
-            if abs(x0 - x1) < self.tol or abs(y0 - y1) < self.tol:
+            if eq(x0 - x1, 0, self.tol) or eq(y0 - y1, 0, self.tol):
                 return ConvexPolygon([])
 
         top = -math.inf
@@ -258,6 +279,46 @@ class ConvexPolygon:
 
         return ConvexPolygon([Point(left, bottom), Point(right, bottom),
                               Point(right, top), Point(left, top)])
+
+    @staticmethod
+    def convexHull(points, color=Color(), tol=1e-9):
+        if not points:
+            return ConvexPolygon([], color=color, tol=tol)
+
+        def initialComp(p, q):
+            return lt(p.y, q.y, tol) or (eq(p.y, q.y, tol) and lt(p.x, q.x, tol))
+
+        p0 = minWithComp(points, comp=initialComp)
+
+        def swipeAngle(p):
+            return (p0.y - p.y)/(p - p0).norm()
+
+        spoints = [p for p in points if p != p0]
+        spoints.sort(key=swipeAngle)
+
+        n = len(spoints)
+        stack = []
+        iter = 0
+        while iter < n:
+            d = Point.distance(p0, spoints[iter])
+            s = swipeAngle(spoints[iter])
+            p = spoints[iter]
+
+            # Of the points aligned with p0, chooses only the furthest ones
+            while iter < n - 1 and eq(swipeAngle(spoints[iter + 1]), s, tol):
+                newd = Point.distance(spoints[iter + 1], p0)
+                if gt(newd, d, tol):
+                    d = newd
+                    p = spoints[iter + 1]
+                iter = iter + 1
+
+            while len(stack) >= 2 and Point.orientation(stack[-1], stack[-2], p) != Orien.ccw:
+                stack.pop()
+
+            stack.append(p)
+            iter = iter + 1
+
+        return ConvexPolygon(points=[p0] + stack, color=color, tol=tol)
 
     # Fix list order. Most rightern point should be the first
     @staticmethod
