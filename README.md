@@ -11,7 +11,7 @@ The class should define, at least, the following operations:
 - [x] Get the coordinates of the centroid of a convex polygon.
 - [x] Check if a convex polygon is regular.
 - [ ] Compute the intersection of two convex polygons.
-- [ ] Compute the convex union of two convex polygons.
+- [x] Compute the convex union of two convex polygons.
 - [x] Compute the bounding box of a convex polygon.
 - [x] Draw convex polygons (with colors) in a PNG image.
 
@@ -19,4 +19,4 @@ The class should define, at least, the following operations:
 ## Other To-dos
 - [x] Declare static methods as actually static.
 - [ ] Fix regular polygon list order. Most western point should be the first in the points list.
-- [ ] Remove tol from the definition of polygon
+- [x] Remove tol from the definition of polygon

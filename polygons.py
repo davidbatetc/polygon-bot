@@ -9,9 +9,9 @@ def shiftZip(xs, ys, shift):
 
 
 def sign(x, tol=1e-9):
-    if abs(x) < tol:
+    if eq(x, 0):
         return 0
-    elif x < 0:
+    elif lt(x, 0):
         return -1
     else:
         return 1
@@ -46,6 +46,14 @@ def gt(x, y, tol):
 
 def eq(x, y, tol):
     return abs(x - y) <= tol
+
+
+def le(x, y, tol):
+    return x - y < tol
+
+
+def ge(x, y, tol):
+    return x - y > -tol
 
 
 class Point:
@@ -195,15 +203,14 @@ class Color:
         self.b = b
 
     def toIntegerTuple(self):
-        return math.floor(256*self.r), math.floor(256*self.g), math.floor(256*self.b)
+        return math.floor(255*self.r), math.floor(255*self.g), math.floor(255*self.b)
 
 
 class ConvexPolygon:
     # Constructor of the class
-    def __init__(self, points=[], color=Color(), tol=1e-9):
+    def __init__(self, points=[], color=Color()):
         self.points = points
         self.color = color
-        self.tol = tol
 
     # This is the method that the function `print()` uses
     def __repr__(self):
@@ -221,9 +228,9 @@ class ConvexPolygon:
 
     # Checks if the given point is inside the polygon
     # TO-DO: Make it O(log n)
-    def isInside(self, p):
+    def isInside(self, p, tol=1e-9):
         for (q1, q2) in shiftZip(self.points, self.points, 1):
-            ori = Point.orientation(p, q1, q2, self.tol)
+            ori = Point.orientation(p, q1, q2, tol)
             if ori == Orien.degen:
                 return True
             elif ori == Orien.cw:
@@ -239,7 +246,7 @@ class ConvexPolygon:
     def getPerimeter(self):
         return sum([e.getLength() for e in self.getEdges()])
 
-    def isRegular(self):
+    def isRegular(self, tol=1e-9):
         n = self.getNumberOfVertices()
         if self.isTrivial() or n == 2:
             return True
@@ -251,7 +258,7 @@ class ConvexPolygon:
         def diffAngle(e1, e2): return abs(expectedAngle - Edge.computeAngle(e1, e2))
         def diffLength(e): return abs(expectedLength - e.getLength())
 
-        return all((eq(diffAngle(e1, e2), 0, self.tol) and eq(diffLength(e1), 0, self.tol)
+        return all((eq(diffAngle(e1, e2), 0, tol) and eq(diffLength(e1), 0, tol)
                     for (e1, e2) in shiftZip(edges, edges, 1)))
 
     def getArea(self):
@@ -263,15 +270,15 @@ class ConvexPolygon:
         n = self.getNumberOfVertices()
         return (sum([p.x for p in self.points])/n, sum([p.y for p in self.points])/n)
 
-    def getBoundingBox(self):
+    def getBoundingBox(self, color=Color(), tol=1e-9):
         if self.isTrivial():
-            return ConvexPolygon([])
+            return ConvexPolygon([], color=color)
         if self.getNumberOfVertices() == 2:
             # Defined for readibility
             x0, y0 = self.points[0].x, self.points[0].y
             x1, y1 = self.points[1].x, self.points[1].y
-            if eq(x0 - x1, 0, self.tol) or eq(y0 - y1, 0, self.tol):
-                return ConvexPolygon([])
+            if eq(x0 - x1, 0, tol) or eq(y0 - y1, 0, tol):
+                return ConvexPolygon([], color=color)
 
         top = -math.inf
         bottom = math.inf
@@ -284,12 +291,12 @@ class ConvexPolygon:
             right = max(right, p.x)
 
         return ConvexPolygon([Point(left, bottom), Point(right, bottom),
-                              Point(right, top), Point(left, top)])
+                              Point(right, top), Point(left, top)], color=color)
 
     @staticmethod
     def convexHull(points, color=Color(), tol=1e-9):
         if not points:
-            return ConvexPolygon([], color=color, tol=tol)
+            return ConvexPolygon([], color=color)
 
         def initialComp(p, q):
             return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
@@ -299,7 +306,7 @@ class ConvexPolygon:
         def swipeAngle(p):
             return (p.y - p0.y)/(p - p0).norm()
 
-        spoints = [p for p in points if p != p0]
+        spoints = [p for p in points if (p - p0).norm() > tol]
         spoints.sort(key=swipeAngle)
 
         n = len(spoints)
@@ -324,7 +331,11 @@ class ConvexPolygon:
             stack.append(p)
             iter = iter + 1
 
-        return ConvexPolygon(points=[p0] + stack, color=color, tol=tol)
+        return ConvexPolygon(points=[p0] + stack, color=color)
+
+    @staticmethod
+    def convexUnion(poly1, poly2, color=Color(), tol=1e-9):
+        return ConvexPolygon.convexHull(poly1.points + poly2.points, color=color, tol=tol)
 
     @staticmethod
     def random(n, xdom=(0, 1), ydom=(0, 1), color=Color(), tol=1e-9):
@@ -381,7 +392,7 @@ class ConvexPolygon:
         while iter <= 2*(n1 + n2):
             p = Edge.intersect(e1, e2)
             if p != None:
-                if inter and (inter[0] - p).norm() < tol:
+                if inter and (inter[0] - p).norm() <= tol:
                     break
                 else:
                     inter.append(p)
@@ -393,12 +404,12 @@ class ConvexPolygon:
             v1 = Vector(e1.p, e1.q)
             v2 = Vector(e2.p, e2.q)
             cross = Vector.crossProductZ(v1, v2)
-            if cross > tol:  # Aka > 0
+            if ge(cross, 0, tol):  # Aka > 0
                 if e1.isInHalfPlane(e2.q):
                     e1 = Edge(e1.q, next(gen1))
                 else:
                     e2 = Edge(e2.q, next(gen2))
-            elif cross < tol:
+            elif le(cross, 0, tol):
                 if e2.isInHalfPlane(e1.q):
                     e2 = Edge(e2.q, next(gen2))
                 else:
