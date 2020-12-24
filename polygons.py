@@ -81,6 +81,10 @@ class Point:
     def distance(p, q):
         return (q - p).norm()
 
+    @staticmethod
+    def isEqual(p, q, tol=1e-9):
+        return eq(Point.distance(p, q), 0, tol)
+
     # `val` is the third coordinate of the vector w = v1 x v2,
     #  where v1 = p2 - p1 and v2 = p3 - p1. This coordinate gives us the
     #  orientation of the basis {v1, v2}:
@@ -213,12 +217,12 @@ class Edge:
             points = [e1.p, e1.q, e2.p, e2.q]
             mi = minWithComp(points, comp)
             ma = maxWithComp(points, lambda p, q: not comp(p, q))
-            spoints = [p for p in points if ne(Point.distance(
-                mi, p), 0, tol) and ne(Point.distance(ma, p), 0, tol)]
+            spoints = [p for p in points if not Point.isEqual(
+                mi, p, tol) and not Point.isEqual(ma, p, tol)]
 
             if not spoints:
                 return Edge.Inter.DEGEN, [mi, ma]
-            elif eq(Point.distance(spoints[0], spoints[1]), 0, tol):
+            elif Point.isEqual(spoints[0], spoints[1], tol):
                 return Edge.Inter.DEGEN, [spoints[0]]
             else:
                 p1 = spoints[0]
@@ -248,9 +252,46 @@ class Color:
 
 class ConvexPolygon:
     # Constructor of the class
-    def __init__(self, points=[], color=Color()):
-        self.points = points
+    def __init__(self, points=[], color=Color(), sortedList=False, tol=1e-9):
         self.color = color
+        if sortedList or not points:
+            self.points = points
+            return
+
+        def initialComp(p, q):
+            return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
+
+        p0 = minWithComp(points, comp=initialComp)
+
+        def swipeAngle(p):
+            return (p.y - p0.y)/(p - p0).norm()
+
+        spoints = [p for p in points if not Point.isEqual(p, p0, tol)]
+        spoints.sort(key=swipeAngle)
+
+        n = len(spoints)
+        stack = []
+        iter = 0
+        while iter < n:
+            d = Point.distance(p0, spoints[iter])
+            s = swipeAngle(spoints[iter])
+            p = spoints[iter]
+
+            # Of the points aligned with p0, chooses only the furthest ones
+            while iter < n - 1 and eq(swipeAngle(spoints[iter + 1]), s, tol):
+                newd = Point.distance(spoints[iter + 1], p0)
+                if gt(newd, d, tol):
+                    d = newd
+                    p = spoints[iter + 1]
+                iter = iter + 1
+
+            while len(stack) >= 2 and Point.orientation(stack[-1], stack[-2], p) != Orien.CW:
+                stack.pop()
+
+            stack.append(p)
+            iter = iter + 1
+
+        self.points = [p0] + stack
 
     # This is the method that the function `print()` uses
     def __repr__(self):
@@ -266,11 +307,9 @@ class ConvexPolygon:
         if n == 0:
             return False
         if n == 1:
-            return eq(Point.distance(self.points[0], p), 0, tol)
+            return Point.isEqual(self.points[0], p, tol)
         if n == 2:
-            p0 = self.points[0]
-            q0 = self.points[1]
-            return eq(Point.distance(p0, p) + Point.distance(p, q0), Point.distance(p0, q0), tol)
+            return Edge(self.points[0], self.points[1]).isInside(p, tol)
 
         for (q1, q2) in shiftZip(self.points, self.points, 1):
             ori = Point.orientation(p, q1, q2, tol)
@@ -319,13 +358,13 @@ class ConvexPolygon:
     def getBoundingBox(self, color=Color(), tol=1e-9):
         n = self.getNumberOfVertices()
         if n <= 1:
-            return ConvexPolygon([], color=color)
+            return ConvexPolygon([], color=color, sortedList=True)
         if n == 2:
             # Defined for readibility
             x0, y0 = self.points[0].x, self.points[0].y
             x1, y1 = self.points[1].x, self.points[1].y
             if eq(x0, x1, tol) or eq(y0, y1, tol):
-                return ConvexPolygon([], color=color)
+                return ConvexPolygon([], color=color, sortedList=True)
 
         top = -math.inf
         bottom = math.inf
@@ -338,51 +377,26 @@ class ConvexPolygon:
             right = max(right, p.x)
 
         return ConvexPolygon([Point(left, bottom), Point(right, bottom),
-                              Point(right, top), Point(left, top)], color=color)
+                              Point(right, top), Point(left, top)], color=color, sortedList=True)
 
     @staticmethod
     def convexHull(points, color=Color(), tol=1e-9):
-        if not points:
-            return ConvexPolygon([], color=color)
-
-        def initialComp(p, q):
-            return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
-
-        p0 = minWithComp(points, comp=initialComp)
-
-        def swipeAngle(p):
-            return (p.y - p0.y)/(p - p0).norm()
-
-        spoints = [p for p in points if ne(Point.distance(p, p0), 0, tol)]
-        spoints.sort(key=swipeAngle)
-
-        n = len(spoints)
-        stack = []
-        iter = 0
-        while iter < n:
-            d = Point.distance(p0, spoints[iter])
-            s = swipeAngle(spoints[iter])
-            p = spoints[iter]
-
-            # Of the points aligned with p0, chooses only the furthest ones
-            while iter < n - 1 and eq(swipeAngle(spoints[iter + 1]), s, tol):
-                newd = Point.distance(spoints[iter + 1], p0)
-                if gt(newd, d, tol):
-                    d = newd
-                    p = spoints[iter + 1]
-                iter = iter + 1
-
-            while len(stack) >= 2 and Point.orientation(stack[-1], stack[-2], p) != Orien.CW:
-                stack.pop()
-
-            stack.append(p)
-            iter = iter + 1
-
-        return ConvexPolygon(points=[p0] + stack, color=color)
+        return ConvexPolygon(points, color=color, tol=tol)
 
     @staticmethod
     def convexUnion(poly1, poly2, color=Color(), tol=1e-9):
         return ConvexPolygon.convexHull(poly1.points + poly2.points, color=color, tol=tol)
+
+    @staticmethod
+    def isEqual(poly1, poly2, tol=1e-9):
+        if poly1.getNumberOfVertices() != poly2.getNumberOfVertices():
+            return False
+
+        for (p, q) in zip(poly1.points, poly2.points):
+            if not Point.isEqual(p, q, tol):
+                return False
+
+        return True
 
     @staticmethod
     def random(n, xdom=(0, 1), ydom=(0, 1), color=Color(), tol=1e-9):
@@ -393,9 +407,9 @@ class ConvexPolygon:
     @staticmethod
     def genRegularPolygon(n=0, r=1, c=Point(0, 0), phase=0, color=Color()):
         if n == 0:
-            return ConvexPolygon([], color=color)
+            return ConvexPolygon([], color=color, sortedList=True)
         if n == 1:
-            return ConvexPolygon([c], color=color)
+            return ConvexPolygon([c], color=color, sortedList=True)
 
         idealShift = (math.pi - phase)*n/(2*math.pi)
         ceilShift = math.ceil(idealShift)
@@ -405,7 +419,8 @@ class ConvexPolygon:
             shift = math.floor(idealShift)
 
         return ConvexPolygon([Point(c.x + r*math.cos(2*math.pi*k/n + phase),
-                                    c.y + r*math.sin(2*math.pi*k/n + phase)) for k in range(shift, n + shift)], color=color)
+                                    c.y + r*math.sin(2*math.pi*k/n + phase)) for k in range(shift, n + shift)],
+                             color=color, sortedList=True)
 
     @staticmethod
     def boundaries(polys):
@@ -425,7 +440,7 @@ class ConvexPolygon:
 
         return left, bottom, right, top
 
-    # Precondition: the vertices are ordered counter-clockwise
+    # Not working yet, needs to be taken care of
     @staticmethod
     def intersect(poly1, poly2, color=Color(), tol=1e-9):
         n1 = poly1.getNumberOfVertices()
@@ -447,7 +462,7 @@ class ConvexPolygon:
         while iter <= 2*(n1 + n2):
             p = Edge.intersect(e1, e2)
             if p != None:
-                if inter and eq(Point.distance(inter[0], p), 0, tol):
+                if inter and Point.isEqual(inter[0], p, tol):
                     break
                 else:
                     inter.append(p)
@@ -474,7 +489,7 @@ class ConvexPolygon:
 
             iter = iter + 1
 
-        return ConvexPolygon(inter, color=color)
+        return ConvexPolygon(inter, color=color, sortedList=True)
 
     @staticmethod
     def draw(polys=[], fileName='output.png', sideLength=400, margin=1, bg=Color(1, 1, 1), show=False):
