@@ -353,7 +353,7 @@ class ConvexPolygon:
 
     def getCentroid(self):
         n = self.getNumberOfVertices()
-        return (sum([p.x for p in self.points])/n, sum([p.y for p in self.points])/n)
+        return Point(sum([p.x for p in self.points])/n, sum([p.y for p in self.points])/n)
 
     def getBoundingBox(self, color=Color(), tol=1e-9):
         n = self.getNumberOfVertices()
@@ -386,6 +386,10 @@ class ConvexPolygon:
     @staticmethod
     def convexUnion(poly1, poly2, color=Color(), tol=1e-9):
         return ConvexPolygon.convexHull(poly1.points + poly2.points, color=color, tol=tol)
+
+    @staticmethod
+    def isContained(poly1, poly2, tol=1e-9):
+        return False  # Tbp
 
     @staticmethod
     def isEqual(poly1, poly2, tol=1e-9):

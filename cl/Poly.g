@@ -1,10 +1,10 @@
+// antlr4 -Dlanguage=Python3 -no-listener Poly.g
 // antlr4 -Dlanguage=Python3 -no-listener -visitor Poly.g
 grammar Poly;
 
-root : (cmt | stmt)* EOF;
-cmt : COMMENT;
+root : (COMMENT | stmt)* EOF;
 stmt : IDEN ASSIGN poly
-     | COLOR poly COLON color
+     | COLOR IDEN COLON color
      | PRINT (poly | QTEXT)
      | AREA poly
      | PERIM poly
@@ -14,14 +14,15 @@ stmt : IDEN ASSIGN poly
      | EQUAL poly COLON poly
      | DRAW QTEXT (COLON poly)*
      ;
-poly : LSQUARE (FLOAT FLOAT)* RSQUARE
+poly : LSQUARE (NUM NUM)* RSQUARE
+     | LPAREN poly RPAREN
      | BOUND poly
      | poly INTER poly
      | poly UNION poly
      | IDEN
-     | RAND FLOAT
+     | RAND NUM
      ;
-color : LCURLY FLOAT FLOAT FLOAT RCURLY;
+color : LCURLY NUM NUM NUM RCURLY;
 
 
 // Operators
@@ -43,12 +44,14 @@ EQUAL : 'equal';
 DRAW : 'draw';
 
 // Others
-LCURLY : '{';
-RCURLY : '}';
+LPAREN : '(';
+RPAREN : ')';
 LSQUARE : '[';
 RSQUARE : ']';
+LCURLY : '{';
+RCURLY : '}';
 COLON : ',';
-FLOAT : [0-9]+ | [0-9]+'.'[0-9]+;
+NUM : ('+' | '-')?([0-9]+ | [0-9]+'.'[0-9]+);
 IDEN : [a-zA-Z][a-zA-Z0-9]*;
 WS : [ \t\n]+ -> skip;
 QTEXT : '"' (~('"'))* '"';

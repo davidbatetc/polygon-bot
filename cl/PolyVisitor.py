@@ -14,11 +14,6 @@ class PolyVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by PolyParser#cmt.
-    def visitCmt(self, ctx:PolyParser.CmtContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by PolyParser#stmt.
     def visitStmt(self, ctx:PolyParser.StmtContext):
         return self.visitChildren(ctx)
