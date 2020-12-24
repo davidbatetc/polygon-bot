@@ -48,6 +48,10 @@ def eq(x, y, tol):
     return abs(x - y) <= tol
 
 
+def ne(x, y, tol):
+    return abs(x - y) > tol
+
+
 def le(x, y, tol):
     return x - y < tol
 
@@ -68,9 +72,6 @@ class Point:
 
     def __sub__(self, q):
         return Vector(self.x - q.x, self.y - q.y)
-
-    def toTuple(self):
-        return self.x, self.y
 
     @staticmethod
     def distance(p, q):
@@ -219,16 +220,19 @@ class ConvexPolygon:
     def getNumberOfVertices(self):
         return len(self.points)
 
-    def toTupleList(self):
-        return [p.toTuple() for p in self.points]
-
-    def isTrivial(self):
-        n = self.getNumberOfVertices()
-        return n == 0 or n == 1
-
     # Checks if the given point is inside the polygon
     # TO-DO: Make it O(log n)
     def isInside(self, p, tol=1e-9):
+        n = self.getNumberOfVertices()
+        if n == 0:
+            return False
+        if n == 1:
+            return eq(Point.distance(self.points[0], p), 0, tol)
+        if n == 2:
+            p0 = self.points[0]
+            q0 = self.points[1]
+            return eq(Point.distance(p0, p) + Point.distance(p, q0), Point.distance(p0, q0), tol)
+
         for (q1, q2) in shiftZip(self.points, self.points, 1):
             ori = Point.orientation(p, q1, q2, tol)
             if ori == Orien.degen:
@@ -239,29 +243,32 @@ class ConvexPolygon:
         return True
 
     def getEdges(self):
-        if self.isTrivial():
+        n = self.getNumberOfVertices()
+        if n <= 1:
             return []
+        if n == 2:
+            return [Edge(self.points[0], self.points[1])]
         return [Edge(p, q) for (p, q) in shiftZip(self.points, self.points, 1)]
 
     def getPerimeter(self):
         return sum([e.getLength() for e in self.getEdges()])
 
     def isRegular(self, tol=1e-9):
-        n = self.getNumberOfVertices()
-        if self.isTrivial() or n == 2:
+        if self.getNumberOfVertices() <= 2:
             return True
 
         edges = self.getEdges()
         expectedAngle = 2*math.pi/n
         expectedLength = edges[0].getLength()  # Arbitrary
 
-        def diffAngle(e1, e2): return abs(expectedAngle - Edge.computeAngle(e1, e2))
-        def diffLength(e): return abs(expectedLength - e.getLength())
-
-        return all((eq(diffAngle(e1, e2), 0, tol) and eq(diffLength(e1), 0, tol)
-                    for (e1, e2) in shiftZip(edges, edges, 1)))
+        return all(eq(Edge.computeAngle(e1, e2), expectedAngle, tol) and
+                   eq(e1.getLength(), expectedLength, tol)
+                   for (e1, e2) in shiftZip(edges, edges, 1))
 
     def getArea(self):
+        if self.getNumberOfVertices() <= 2:
+            return 0
+
         xs = [p.x for p in self.points]
         ys = [q.y - p.y for (p, q) in shiftZip(self.points, self.points, 2)]
         return sum([x*y for (x, y) in shiftZip(xs, ys, -1)])/2
@@ -271,13 +278,14 @@ class ConvexPolygon:
         return (sum([p.x for p in self.points])/n, sum([p.y for p in self.points])/n)
 
     def getBoundingBox(self, color=Color(), tol=1e-9):
-        if self.isTrivial():
+        n = self.getNumberOfVertices()
+        if n <= 1:
             return ConvexPolygon([], color=color)
-        if self.getNumberOfVertices() == 2:
+        if n == 2:
             # Defined for readibility
             x0, y0 = self.points[0].x, self.points[0].y
             x1, y1 = self.points[1].x, self.points[1].y
-            if eq(x0 - x1, 0, tol) or eq(y0 - y1, 0, tol):
+            if eq(x0, x1, tol) or eq(y0, y1, tol):
                 return ConvexPolygon([], color=color)
 
         top = -math.inf
@@ -306,7 +314,7 @@ class ConvexPolygon:
         def swipeAngle(p):
             return (p.y - p0.y)/(p - p0).norm()
 
-        spoints = [p for p in points if (p - p0).norm() > tol]
+        spoints = [p for p in points if ne(Point.distance(p, p0), 0, tol)]
         spoints.sort(key=swipeAngle)
 
         n = len(spoints)
@@ -349,8 +357,16 @@ class ConvexPolygon:
             return ConvexPolygon([], color=color)
         if n == 1:
             return ConvexPolygon([c], color=color)
+
+        idealShift = (math.pi - phase)*n/(2*math.pi)
+        ceilShift = math.ceil(idealShift)
+        if ceilShift - idealShift <= 0.5:
+            shift = ceilShift
+        else:
+            shift = math.floor(idealShift)
+
         return ConvexPolygon([Point(c.x + r*math.cos(2*math.pi*k/n + phase),
-                                    c.y + r*math.sin(2*math.pi*k/n + phase)) for k in range(0, n)], color=color)
+                                    c.y + r*math.sin(2*math.pi*k/n + phase)) for k in range(shift, n + shift)], color=color)
 
     @staticmethod
     def boundaries(polys):
@@ -392,7 +408,7 @@ class ConvexPolygon:
         while iter <= 2*(n1 + n2):
             p = Edge.intersect(e1, e2)
             if p != None:
-                if inter and (inter[0] - p).norm() <= tol:
+                if inter and eq(Point.distance(inter[0], p), 0, tol):
                     break
                 else:
                     inter.append(p)
@@ -423,7 +439,7 @@ class ConvexPolygon:
 
     @staticmethod
     def draw(polys=[], fileName='output.png', sideLength=400, margin=1, bg=Color(1, 1, 1), show=False):
-        img = Image.new('RGB', (sideLength, sideLength), bg.toIntegerTuple())
+        img = Image.new('RGB'ConvexPolygon(points), (sideLength, sideLength), bg.toIntegerTuple())
         dib = ImageDraw.Draw(img)
 
         if not polys:
@@ -444,11 +460,11 @@ class ConvexPolygon:
             y0 = bottom - (xspan - yspan)/2
             factor = (sideLength - 2*margin)/xspan
 
-        def fitToCanvas(tupleList):
-            return [((x - x0)*factor + margin, sideLength - (y - y0)*factor - margin) for (x, y) in tupleList]
+        def fitToCanvas(poly):
+            return [((p.x - x0)*factor + margin, sideLength - (p.y - y0)*factor - margin) for p in poly.points]
 
         for poly in polys:
-            dib.polygon(fitToCanvas(poly.toTupleList()), outline=poly.color.toIntegerTuple())
+            dib.polygon(fitToCanvas(poly), outline=poly.color.toIntegerTuple())
 
         if show:
             img.show()
