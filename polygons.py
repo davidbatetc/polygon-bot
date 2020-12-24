@@ -9,9 +9,9 @@ def shiftZip(xs, ys, shift):
 
 
 def sign(x, tol=1e-9):
-    if eq(x, 0):
+    if eq(x, 0, tol):
         return 0
-    elif lt(x, 0):
+    elif lt(x, 0, tol):
         return -1
     else:
         return 1
@@ -34,6 +34,10 @@ def minWithComp(xs, comp=lambda x, y: x < y):
         if comp(xs[i], theMin):
             theMin = xs[i]
     return theMin
+
+
+def maxWithComp(xs, comp=lambda x, y: x > y):
+    return minWithComp(xs, comp=comp)
 
 
 def lt(x, y, tol):
@@ -93,11 +97,11 @@ class Point:
     def orientation(p1, p2, p3, tol=1e-9):
         cross = Vector.crossProductZ(p2 - p1, p3 - p1)
         if eq(cross, 0, tol):
-            return Orien.degen
+            return Orien.DEGEN
         if lt(cross, 0, tol):
-            return Orien.cw
+            return Orien.CW
         if gt(cross, 0, tol):
-            return Orien.ccw
+            return Orien.CCW
 
     @staticmethod
     def random(xdom=(0, 1), ydom=(0, 1)):
@@ -137,12 +141,17 @@ class Vector:
 
 # Orientation class defined as a sort of enum for better readibility
 class Orien:
-    ccw = 1    # Counter-clockwise
-    degen = 0  # Degenerate
-    cw = -1    # Clockwise
+    CCW = 1    # Counter-clockwise
+    DEGEN = 0  # Degenerate
+    CW = -1    # Clockwise
 
 
 class Edge:
+    class Inter:
+        CROSS = 1
+        DEGEN = 0
+        NONE = -1
+
     def __init__(self, p, q):
         self.p = p
         self.q = q
@@ -158,6 +167,9 @@ class Edge:
         v = r - self.p
         return gt(Vector.crossProductZ(u, v), 0, tol)
 
+    def isInside(self, p, tol=1e-9):
+        return eq(Point.distance(self.p, p) + Point.distance(p, self.q), self.getLength(), tol)
+
     @staticmethod
     def computeAngle(e1, e2):
         return Vector.computeAngle(e1.q - e1.p, e2.q - e2.p)
@@ -171,30 +183,57 @@ class Edge:
         ori2q = Point.orientation(e2.p, e2.q, e1.q, tol)
 
         # Degenerate case
-        if ori1p == Orien.degen and ori1q == Orien.degen \
-                and ori2p == Orien.degen and ori2q == Orien.degen:
-            return not (sign(e1.p.x - e2.p.x) == sign(e1.p.x - e2.q.x)
-                        == sign(e1.q.x - e2.p.x) == sign(e1.q.x - e2.q.x)) \
-                and not (sign(e1.p.y - e2.p.y) == sign(e1.p.y - e2.q.y)
-                         == sign(e1.q.y - e2.p.y) == sign(e1.q.y - e2.q.y))
+        if ori1p == Orien.DEGEN and ori1q == Orien.DEGEN \
+                and ori2p == Orien.DEGEN and ori2q == Orien.DEGEN:
+            if (ori1p == 0 and e1.isInside(e2.p)) or (ori1q == 0 and e1.isInside(e2.q)) \
+                    or (ori2p == 0 and e2.isInside(e1.p)) or (ori2q == 0 and e2.isInside(e1.q)):
+                return Edge.Inter.DEGEN
+            else:
+                print('HeLLO')
+                return Edge.Inter.NONE
 
         # General case
         else:
-            return ori1p != ori1q and ori2p != ori2q
+            if ori1p != ori1q and ori2p != ori2q:
+                return Edge.Inter.CROSS
+            else:
+                return Edge.Inter.NONE
 
     # Fix corner cases
     @staticmethod
     def intersect(e1, e2, tol=1e-9):
-        if not Edge.hasIntersection(e1, e2, tol):
-            return None
+        interType = Edge.hasIntersection(e1, e2, tol)
+        if interType == Edge.Inter.NONE:
+            return Edge.Inter.NONE, None
 
-        den = (e1.p.x - e1.q.x)*(e2.p.y - e2.q.y) - (e1.p.y - e1.q.y)*(e2.p.x - e2.q.x)
-        a = e1.p.x*e1.q.y - e1.p.y*e1.q.x
-        b = e2.p.x*e2.q.y - e2.p.y*e2.q.x
-        px = (a*(e2.p.x - e2.q.x) - (e1.p.x - e1.q.x)*b)/den
-        py = (a*(e2.p.y - e2.q.y) - (e1.p.y - e1.q.y)*b)/den
+        if interType == Edge.Inter.DEGEN:
+            def comp(p, q):
+                return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
 
-        return Point(px, py)
+            points = [e1.p, e1.q, e2.p, e2.q]
+            mi = minWithComp(points, comp)
+            ma = maxWithComp(points, lambda p, q: not comp(p, q))
+            spoints = [p for p in points if ne(Point.distance(
+                mi, p), 0, tol) and ne(Point.distance(ma, p), 0, tol)]
+
+            if not spoints:
+                return Edge.Inter.DEGEN, [mi, ma]
+            elif eq(Point.distance(spoints[0], spoints[1]), 0, tol):
+                return Edge.Inter.DEGEN, [spoints[0]]
+            else:
+                p1 = spoints[0]
+                p2 = spoints[1]
+                if comp(p2, p1):
+                    p1, p2 = p2, p1
+                return Edge.Inter.DEGEN, [p1, p2]
+
+        if interType == Edge.Inter.CROSS:
+            den = (e1.p.x - e1.q.x)*(e2.p.y - e2.q.y) - (e1.p.y - e1.q.y)*(e2.p.x - e2.q.x)
+            a = e1.p.x*e1.q.y - e1.p.y*e1.q.x
+            b = e2.p.x*e2.q.y - e2.p.y*e2.q.x
+            px = (a*(e2.p.x - e2.q.x) - (e1.p.x - e1.q.x)*b)/den
+            py = (a*(e2.p.y - e2.q.y) - (e1.p.y - e1.q.y)*b)/den
+            return Edge.Inter.CROSS, Point(px, py)
 
 
 class Color:
@@ -235,9 +274,9 @@ class ConvexPolygon:
 
         for (q1, q2) in shiftZip(self.points, self.points, 1):
             ori = Point.orientation(p, q1, q2, tol)
-            if ori == Orien.degen:
+            if ori == Orien.DEGEN:
                 return True
-            elif ori == Orien.cw:
+            elif ori == Orien.CW:
                 return False
 
         return True
@@ -333,7 +372,7 @@ class ConvexPolygon:
                     p = spoints[iter + 1]
                 iter = iter + 1
 
-            while len(stack) >= 2 and Point.orientation(stack[-1], stack[-2], p) != Orien.cw:
+            while len(stack) >= 2 and Point.orientation(stack[-1], stack[-2], p) != Orien.CW:
                 stack.pop()
 
             stack.append(p)
@@ -388,7 +427,7 @@ class ConvexPolygon:
 
     # Precondition: the vertices are ordered counter-clockwise
     @staticmethod
-    def intersect(poly1, poly2, tol=1e-9):
+    def intersect(poly1, poly2, color=Color(), tol=1e-9):
         n1 = poly1.getNumberOfVertices()
         n2 = poly2.getNumberOfVertices()
         if n1 == 0 or n2 == 0:
@@ -435,11 +474,11 @@ class ConvexPolygon:
 
             iter = iter + 1
 
-        return inter
+        return ConvexPolygon(inter, color=color)
 
     @staticmethod
     def draw(polys=[], fileName='output.png', sideLength=400, margin=1, bg=Color(1, 1, 1), show=False):
-        img = Image.new('RGB'ConvexPolygon(points), (sideLength, sideLength), bg.toIntegerTuple())
+        img = Image.new('RGB', (sideLength, sideLength), bg.toIntegerTuple())
         dib = ImageDraw.Draw(img)
 
         if not polys:
