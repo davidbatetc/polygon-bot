@@ -208,7 +208,7 @@ class Edge:
     def intersect(e1, e2, tol=1e-9):
         interType = Edge.hasIntersection(e1, e2, tol)
         if interType == Edge.Inter.NONE:
-            return Edge.Inter.NONE, None
+            return Edge.Inter.NONE, []
 
         if interType == Edge.Inter.DEGEN:
             def comp(p, q):
@@ -237,7 +237,7 @@ class Edge:
             b = e2.p.x*e2.q.y - e2.p.y*e2.q.x
             px = (a*(e2.p.x - e2.q.x) - (e1.p.x - e1.q.x)*b)/den
             py = (a*(e2.p.y - e2.q.y) - (e1.p.y - e1.q.y)*b)/den
-            return Edge.Inter.CROSS, Point(px, py)
+            return Edge.Inter.CROSS, [Point(px, py)]
 
 
 class Color:
@@ -300,8 +300,7 @@ class ConvexPolygon:
     def getNumberOfVertices(self):
         return len(self.points)
 
-    # Checks if the given point is inside the polygon
-    # TO-DO: Make it O(log n)
+    # O(log n)
     def isInside(self, p, tol=1e-9):
         n = self.getNumberOfVertices()
         if n == 0:
@@ -311,14 +310,32 @@ class ConvexPolygon:
         if n == 2:
             return Edge(self.points[0], self.points[1]).isInside(p, tol)
 
-        for (q1, q2) in shiftZip(self.points, self.points, 1):
-            ori = Point.orientation(p, q1, q2, tol)
-            if ori == Orien.DEGEN:
-                return True
-            elif ori == Orien.CW:
-                return False
+        def isInsideTriangle(q1, q2, q3):
+            ori1 = Point.orientation(p, q1, q2)
+            ori2 = Point.orientation(p, q2, q3)
+            ori3 = Point.orientation(p, q3, q1)
+            return (ori1 == Orien.CCW and ori2 == Orien.CCW and ori3 == Orien.CCW) or \
+                (ori1 == Orien.DEGEN and Edge(q1, q2).isInside(p)) or \
+                (ori2 == Orien.DEGEN and Edge(q2, q3).isInside(p)) or \
+                (ori3 == Orien.DEGEN and Edge(q3, q1).isInside(p))
 
-        return True
+        q0 = self.points[0]
+
+        def binarySlicing(li, ri):
+            if ri - li == 1:
+                return isInsideTriangle(self.points[0], self.points[li], self.points[ri])
+
+            mi = (li + ri)//2
+            qm = self.points[mi]
+            ori = Point.orientation(p, q0, qm)
+            if ori == Orien.DEGEN:
+                return Edge(q0, qm).isInside(p)
+            elif ori == Orien.CW:
+                return binarySlicing(li, mi)
+            else:
+                return binarySlicing(mi, ri)
+
+        return binarySlicing(1, n - 1)
 
     def getEdges(self):
         n = self.getNumberOfVertices()
@@ -461,8 +478,9 @@ class ConvexPolygon:
         inside = None
         iter = 0
         while iter <= 2*(n1 + n2):
-            p = Edge.intersect(e1, e2)
-            if p != None:
+            interType, currInterPoints = Edge.intersect(e1, e2)
+            if interType == Edge.Inter.CROSS:
+                p = currInterPoints[0]
                 if inter and Point.isEqual(inter[0], p, tol):
                     break
                 else:
@@ -471,11 +489,13 @@ class ConvexPolygon:
                         inside = 'poly1'
                     else:
                         inside = 'poly2'
+            elif interType == Edge.Inter.DEGEN:
+                print('Woops, degenerate intersection!')
 
             v1 = Vector(e1.p, e1.q)
             v2 = Vector(e2.p, e2.q)
             cross = Vector.crossProductZ(v1, v2)
-            if ge(cross, 0, tol):  # Aka > 0
+            if ge(cross, 0, tol):
                 if e1.isInHalfPlane(e2.q):
                     e1 = Edge(e1.q, next(gen1))
                 else:
@@ -522,7 +542,8 @@ class ConvexPolygon:
                 factor = (sideLength - 1 - 2*margin)/xspan
 
             def fitToCanvas(poly):
-                return [((p.x - x0)*factor + margin, sideLength - 1 - (p.y - y0)*factor - margin) for p in poly.points]
+                return [(round((p.x - x0)*factor + margin),
+                         round(sideLength - 1 - (p.y - y0)*factor - margin)) for p in poly.points]
 
         for poly in polys:
             n = poly.getNumberOfVertices()

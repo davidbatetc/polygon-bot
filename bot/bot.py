@@ -48,7 +48,7 @@ def end(update, context):
         )
 
 
-#
+# For user messages handling
 def handleMessage(update, context):
     if 'isProgramRunning' not in context.chat_data:
         context.chat_data['isProgramRunning'] = False
