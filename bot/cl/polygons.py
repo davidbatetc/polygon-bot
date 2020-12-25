@@ -1,5 +1,6 @@
 import math
 import random
+import copy
 from PIL import Image, ImageDraw
 
 
@@ -218,15 +219,15 @@ class Edge:
                 mi, p, tol) and not Point.isEqual(ma, p, tol)]
 
             if not spoints:
-                return Edge.Inter.DEGEN, [mi, ma]
+                return Edge.Inter.DEGEN, [copy.deepcopy(mi), copy.deepcopy(ma)]
             elif Point.isEqual(spoints[0], spoints[1], tol):
-                return Edge.Inter.DEGEN, [spoints[0]]
+                return Edge.Inter.DEGEN, [copy.deepcopy(spoints[0])]
             else:
                 p1 = spoints[0]
                 p2 = spoints[1]
                 if comp(p2, p1):
                     p1, p2 = p2, p1
-                return Edge.Inter.DEGEN, [p1, p2]
+                return Edge.Inter.DEGEN, [copy.deepcopy(p1), copy.deepcopy(p2)]
 
         if interType == Edge.Inter.CROSS:
             den = (e1.p.x - e1.q.x)*(e2.p.y - e2.q.y) - (e1.p.y - e1.q.y)*(e2.p.x - e2.q.x)
@@ -242,6 +243,9 @@ class Color:
         self.r = r
         self.g = g
         self.b = b
+
+    def __repr__(self):
+        return '{{{:.3f} {:.3f} {:.3f}}}'.format(self.r, self.g, self.b)
 
     def toIntegerTuple(self):
         return math.floor(255*self.r), math.floor(255*self.g), math.floor(255*self.b)
@@ -288,7 +292,7 @@ class ConvexPolygon:
             stack.append(p)
             iter = iter + 1
 
-        self.points = [p0] + stack
+        self.points = [copy.deepcopy(p0)] + copy.deepcopy(stack)
 
     # This is the method that the function `print()` uses
     def __repr__(self):
@@ -394,12 +398,8 @@ class ConvexPolygon:
                               Point(right, top), Point(left, top)], color=color, sortedList=True)
 
     @staticmethod
-    def convexHull(points, color=Color(), tol=1e-9):
-        return ConvexPolygon(points, color=color, tol=tol)
-
-    @staticmethod
     def convexUnion(poly1, poly2, color=Color(), tol=1e-9):
-        return ConvexPolygon.convexHull(poly1.points + poly2.points, color=color, tol=tol)
+        return ConvexPolygon(poly1.points + poly2.points, color=color, tol=tol)
 
     @staticmethod
     def isContained(poly1, poly2, tol=1e-9):
@@ -421,13 +421,12 @@ class ConvexPolygon:
         points = [Point.random(xdom=xdom, ydom=ydom) for _ in range(0, n)]
         return ConvexPolygon(points, color=color, tol=tol)
 
-    # Fix list order. Most rightern point should be the first
     @staticmethod
     def genRegularPolygon(n=0, r=1, c=Point(0, 0), phase=0, color=Color()):
         if n == 0:
             return ConvexPolygon([], color=color, sortedList=True)
         if n == 1:
-            return ConvexPolygon([c], color=color, sortedList=True)
+            return ConvexPolygon([copy.deepcopy(c)], color=color, sortedList=True)
 
         idealShift = (math.pi - phase)*n/(2*math.pi)
         ceilShift = math.ceil(idealShift)
@@ -458,28 +457,30 @@ class ConvexPolygon:
     # Not working yet, needs to be taken care of
     @staticmethod
     def intersect(poly1, poly2, color=Color(), tol=1e-9):
+        emptyPoly = ConvexPolygon([], color=Color(), sortedList=True)
+
         def trivialCases(spoly1, spoly2, sn1, sn2):
             if sn2 == 0:
-                return ConvexPolygon([], sortedList=True)
+                return emptyPoly
             if sn1 == 1:
                 if poly2.isPointInside(spoly1.points[0]):
-                    return spoly1
+                    return copy.deepcopy(spoly1)
                 else:
-                    return ConvexPolygon([], sortedList=True)
+                    return emptyPoly
             if sn1 == 2:
                 if poly2.isPointInside(spoly1.points[0]) and poly2.isPointInside(spoly1.points[1]):
-                    return spoly1
+                    return copy.deepcopy(spoly1)
                 else:
-                    print('fucc')
-                    return ConvexPolygon([], sortedList=True)
+                    print('Not implemented.')
+                    return emptyPoly
 
         n1 = poly1.getNumberOfVertices()
         n2 = poly2.getNumberOfVertices()
         if n1 <= 2 or n2 <= 2:
             if n1 <= n2:
-                return trivial(poly1, poly2, n1, n2)
+                return trivialCases(poly1, poly2, n1, n2)
             else:
-                return trivial(poly2, poly1, n2, n1)
+                return trivialCases(poly2, poly1, n2, n1)
 
         class Place:
             inPoly1 = -1
@@ -539,10 +540,10 @@ class ConvexPolygon:
         p1 = poly1.points[0]
         p2 = poly2.points[0]
         if poly2.isPointInside(p1):
-            return poly1
+            return copy.deepcopy(poly1)
         if poly1.isPointInside(p2):
-            return poly2
-        return ConvexPolygon([], sortedList=True)
+            return copy.deepcopy(poly2)
+        return emptyPoly
 
     @staticmethod
     def draw(polys=[], fileName='output.png', sideLength=400, margin=1, bg=Color(1, 1, 1), show=False, tol=1e-9):
