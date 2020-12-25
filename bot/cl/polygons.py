@@ -101,11 +101,11 @@ class Point:
     def orientation(p1, p2, p3, tol=1e-9):
         cross = Vector.crossProductZ(p2 - p1, p3 - p1)
         if eq(cross, 0, tol):
-            return Orien.DEGEN
+            return Vector.Orien.DEGEN
         if lt(cross, 0, tol):
-            return Orien.CW
+            return Vector.Orien.CW
         if gt(cross, 0, tol):
-            return Orien.CCW
+            return Vector.Orien.CCW
 
     @staticmethod
     def random(xdom=(0, 1), ydom=(0, 1)):
@@ -114,6 +114,12 @@ class Point:
 
 
 class Vector:
+    # Orientation class defined as a sort of enum for better readibility
+    class Orien:
+        CCW = 1    # Counter-clockwise
+        DEGEN = 0  # Degenerate
+        CW = -1    # Clockwise
+
     def __init__(self, x, y):
         if isinstance(x, Point) and isinstance(y, Point):
             self.x = y.x - x.x
@@ -141,13 +147,6 @@ class Vector:
     @staticmethod
     def computeAngle(u, v):
         return math.acos(Vector.dotProduct(u, v)/(u.norm()*v.norm()))
-
-
-# Orientation class defined as a sort of enum for better readibility
-class Orien:
-    CCW = 1    # Counter-clockwise
-    DEGEN = 0  # Degenerate
-    CW = -1    # Clockwise
 
 
 class Edge:
@@ -187,8 +186,8 @@ class Edge:
         ori2q = Point.orientation(e2.p, e2.q, e1.q, tol)
 
         # Degenerate case
-        if ori1p == Orien.DEGEN and ori1q == Orien.DEGEN \
-                and ori2p == Orien.DEGEN and ori2q == Orien.DEGEN:
+        if ori1p == Vector.Orien.DEGEN and ori1q == Vector.Orien.DEGEN \
+                and ori2p == Vector.Orien.DEGEN and ori2q == Vector.Orien.DEGEN:
             if (ori1p == 0 and e1.isInside(e2.p)) or (ori1q == 0 and e1.isInside(e2.q)) \
                     or (ori2p == 0 and e2.isInside(e1.p)) or (ori2q == 0 and e2.isInside(e1.q)):
                 return Edge.Inter.DEGEN
@@ -285,7 +284,7 @@ class ConvexPolygon:
                     p = spoints[iter + 1]
                 iter = iter + 1
 
-            while len(stack) >= 2 and Point.orientation(stack[-1], stack[-2], p) != Orien.CW:
+            while len(stack) >= 2 and Point.orientation(stack[-1], stack[-2], p) != Vector.Orien.CW:
                 stack.pop()
 
             stack.append(p)
@@ -314,10 +313,10 @@ class ConvexPolygon:
             ori1 = Point.orientation(p, q1, q2)
             ori2 = Point.orientation(p, q2, q3)
             ori3 = Point.orientation(p, q3, q1)
-            return (ori1 == Orien.CCW and ori2 == Orien.CCW and ori3 == Orien.CCW) or \
-                (ori1 == Orien.DEGEN and Edge(q1, q2).isInside(p)) or \
-                (ori2 == Orien.DEGEN and Edge(q2, q3).isInside(p)) or \
-                (ori3 == Orien.DEGEN and Edge(q3, q1).isInside(p))
+            return (ori1 == Vector.Orien.CCW and ori2 == Vector.Orien.CCW and ori3 == Vector.Orien.CCW) or \
+                (ori1 == Vector.Orien.DEGEN and Edge(q1, q2).isInside(p)) or \
+                (ori2 == Vector.Orien.DEGEN and Edge(q2, q3).isInside(p)) or \
+                (ori3 == Vector.Orien.DEGEN and Edge(q3, q1).isInside(p))
 
         q0 = self.points[0]
 
@@ -328,9 +327,9 @@ class ConvexPolygon:
             mi = (li + ri)//2
             qm = self.points[mi]
             ori = Point.orientation(p, q0, qm)
-            if ori == Orien.DEGEN:
+            if ori == Vector.Orien.DEGEN:
                 return Edge(q0, qm).isInside(p)
-            elif ori == Orien.CW:
+            elif ori == Vector.Orien.CW:
                 return binarySlicing(li, mi)
             else:
                 return binarySlicing(mi, ri)
