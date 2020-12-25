@@ -295,7 +295,7 @@ class ConvexPolygon:
             stack.append(p)
             iter = iter + 1
 
-        self.points = [copy.deepcopy(p0)] + copy.deepcopy(stack)
+        self.points = [p0] + stack
 
     # This is the method that the function `print()` uses
     def __repr__(self):
