@@ -405,7 +405,7 @@ class ConvexPolygon:
     @staticmethod
     def random(n, xdom=(0, 1), ydom=(0, 1), color=Color(), tol=1e-9):
         points = [Point.random(xdom=xdom, ydom=ydom) for _ in range(0, n)]
-        return ConvexPolygon.convexHull(points, color=color, tol=tol)
+        return ConvexPolygon(points, color=color, tol=tol)
 
     # Fix list order. Most rightern point should be the first
     @staticmethod
@@ -428,9 +428,6 @@ class ConvexPolygon:
 
     @staticmethod
     def boundaries(polys):
-        if not polys:
-            return None
-
         left = math.inf
         bottom = math.inf
         right = -math.inf
@@ -496,7 +493,7 @@ class ConvexPolygon:
         return ConvexPolygon(inter, color=color, sortedList=True)
 
     @staticmethod
-    def draw(polys=[], fileName='output.png', sideLength=400, margin=1, bg=Color(1, 1, 1), show=False):
+    def draw(polys=[], fileName='output.png', sideLength=400, margin=1, bg=Color(1, 1, 1), show=False, tol=1e-9):
         img = Image.new('RGB', (sideLength, sideLength), bg.toIntegerTuple())
         dib = ImageDraw.Draw(img)
 
@@ -507,22 +504,33 @@ class ConvexPolygon:
             return
 
         left, bottom, right, top = ConvexPolygon.boundaries(polys)
-        xspan = right - left
-        yspan = top - bottom
-        if xspan < yspan:
-            x0 = left - (yspan - xspan)/2
-            y0 = bottom
-            factor = (sideLength - 2*margin)/yspan
-        else:
-            x0 = left
-            y0 = bottom - (xspan - yspan)/2
-            factor = (sideLength - 2*margin)/xspan
 
-        def fitToCanvas(poly):
-            return [((p.x - x0)*factor + margin, sideLength - (p.y - y0)*factor - margin) for p in poly.points]
+        if eq(left, right, tol) and eq(bottom, top, tol):
+            def fitToCanvas(poly):
+                return [(sideLength/2, sideLength/2) for p in poly.points]
+        else:
+            xspan = right - left
+            yspan = top - bottom
+
+            if xspan <= yspan:
+                x0 = left - (yspan - xspan)/2
+                y0 = bottom
+                factor = (sideLength - 1 - 2*margin)/yspan
+            else:
+                x0 = left
+                y0 = bottom - (xspan - yspan)/2
+                factor = (sideLength - 1 - 2*margin)/xspan
+
+            def fitToCanvas(poly):
+                return [((p.x - x0)*factor + margin, sideLength - 1 - (p.y - y0)*factor - margin) for p in poly.points]
 
         for poly in polys:
-            dib.polygon(fitToCanvas(poly), outline=poly.color.toIntegerTuple())
+            n = poly.getNumberOfVertices()
+            if n == 1:
+                dib.point(fitToCanvas(poly), fill=poly.color.toIntegerTuple())
+            elif n >= 2:
+                print(fitToCanvas(poly))
+                dib.polygon(fitToCanvas(poly), outline=poly.color.toIntegerTuple())
 
         if show:
             img.show()

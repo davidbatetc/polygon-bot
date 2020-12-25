@@ -2,3 +2,6 @@
 test.py
 bot/token.txt
 output.png
+bot/cl/__pycache__
+cl/__pycache__
+bot/*.png

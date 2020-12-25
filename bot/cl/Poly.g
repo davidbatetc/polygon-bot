@@ -20,6 +20,7 @@ poly : LSQUARE (NUM NUM)* RSQUARE
      | poly INTER poly
      | poly UNION poly
      | IDEN
+     | REGPOLY NUM COLON NUM COLON NUM NUM COLON NUM
      | RAND NUM
      ;
 color : LCURLY NUM NUM NUM RCURLY;
@@ -42,6 +43,7 @@ CENTR : 'centroid';
 INSIDE : 'inside';
 EQUAL : 'equal';
 DRAW : 'draw';
+REGPOLY : 'regular';
 
 // Others
 LPAREN : '(';
