@@ -1,3 +1,5 @@
+# antlr4 -Dlanguage=Python3 -no-listener -visitor Poly.g
+
 import sys
 from antlr4 import *
 from PolyLexer import PolyLexer

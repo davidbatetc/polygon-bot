@@ -13,12 +13,14 @@ stmt : IDEN ASSIGN poly
      | INSIDE poly COLON poly
      | EQUAL poly COLON poly
      | DRAW QTEXT (COLON poly)*
+     | TRANS IDEN COLON NUM NUM
      ;
 poly : LSQUARE (NUM NUM)* RSQUARE
      | LPAREN poly RPAREN
      | BOUND poly
      | poly INTER poly
      | poly UNION poly
+     | COPY IDEN
      | IDEN
      | REGPOLY NUM COLON NUM COLON NUM NUM COLON NUM
      | RAND NUM
@@ -44,6 +46,8 @@ INSIDE : 'inside';
 EQUAL : 'equal';
 DRAW : 'draw';
 REGPOLY : 'regular';
+COPY : 'copy';
+TRANS : 'translate';
 
 // Others
 LPAREN : '(';

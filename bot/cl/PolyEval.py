@@ -70,6 +70,10 @@ class PolyEval(PolyVisitor):
             polys = [self.visit(l[i]) for i in range(3, n, 2)]
             ConvexPolygon.draw(polys, fileName=fileName)
             return 'Image: ' + fileName + '\n'
+        elif keyWord == PolyParser.TRANS:
+            name = l[1].getText()
+            u = Vector(float(l[3].getText()), float(l[4].getText()))
+            self.polyDict[name].translate(u)
 
     def visitPoly(self, ctx: PolyParser.PolyContext):
         l = list(ctx.getChildren())
@@ -96,6 +100,8 @@ class PolyEval(PolyVisitor):
                 return self.visit(l[1])
             elif keyWord == PolyParser.BOUND:
                 return self.visit(l[1]).getBoundingBox()
+            elif keyWord == PolyParser.COPY:
+                return copy.deepcopy(self.polyDict[l[1].getText()])
             elif keyWord == PolyParser.IDEN:
                 return self.polyDict[l[0].getText()]
             elif keyWord == PolyParser.REGPOLY:

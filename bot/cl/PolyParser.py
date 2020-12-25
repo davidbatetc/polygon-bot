@@ -11,43 +11,45 @@ else:
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\35")
-        buf.write("l\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\3\2\3\2\7\2\r\n\2\f")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\37")
+        buf.write("s\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\3\2\3\2\7\2\r\n\2\f")
         buf.write("\2\16\2\20\13\2\3\2\3\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3")
         buf.write("\3\3\3\3\3\5\3\36\n\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3")
         buf.write("\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3")
-        buf.write("\3\7\3\66\n\3\f\3\16\39\13\3\5\3;\n\3\3\4\3\4\3\4\3\4")
-        buf.write("\7\4A\n\4\f\4\16\4D\13\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3")
-        buf.write("\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4Y\n")
-        buf.write("\4\3\4\3\4\3\4\3\4\3\4\3\4\7\4a\n\4\f\4\16\4d\13\4\3\5")
-        buf.write("\3\5\3\5\3\5\3\5\3\5\3\5\2\3\6\6\2\4\6\b\2\2\2|\2\16\3")
-        buf.write("\2\2\2\4:\3\2\2\2\6X\3\2\2\2\be\3\2\2\2\n\r\7\35\2\2\13")
-        buf.write("\r\5\4\3\2\f\n\3\2\2\2\f\13\3\2\2\2\r\20\3\2\2\2\16\f")
-        buf.write("\3\2\2\2\16\17\3\2\2\2\17\21\3\2\2\2\20\16\3\2\2\2\21")
-        buf.write("\22\7\2\2\3\22\3\3\2\2\2\23\24\7\32\2\2\24\25\7\3\2\2")
-        buf.write("\25;\5\6\4\2\26\27\7\b\2\2\27\30\7\32\2\2\30\31\7\30\2")
-        buf.write("\2\31;\5\b\5\2\32\35\7\t\2\2\33\36\5\6\4\2\34\36\7\34")
-        buf.write("\2\2\35\33\3\2\2\2\35\34\3\2\2\2\36;\3\2\2\2\37 \7\n\2")
-        buf.write("\2 ;\5\6\4\2!\"\7\13\2\2\";\5\6\4\2#$\7\f\2\2$;\5\6\4")
-        buf.write("\2%&\7\r\2\2&;\5\6\4\2\'(\7\16\2\2()\5\6\4\2)*\7\30\2")
-        buf.write("\2*+\5\6\4\2+;\3\2\2\2,-\7\17\2\2-.\5\6\4\2./\7\30\2\2")
-        buf.write("/\60\5\6\4\2\60;\3\2\2\2\61\62\7\20\2\2\62\67\7\34\2\2")
-        buf.write("\63\64\7\30\2\2\64\66\5\6\4\2\65\63\3\2\2\2\669\3\2\2")
-        buf.write("\2\67\65\3\2\2\2\678\3\2\2\28;\3\2\2\29\67\3\2\2\2:\23")
-        buf.write("\3\2\2\2:\26\3\2\2\2:\32\3\2\2\2:\37\3\2\2\2:!\3\2\2\2")
-        buf.write(":#\3\2\2\2:%\3\2\2\2:\'\3\2\2\2:,\3\2\2\2:\61\3\2\2\2")
-        buf.write(";\5\3\2\2\2<=\b\4\1\2=B\7\24\2\2>?\7\31\2\2?A\7\31\2\2")
-        buf.write("@>\3\2\2\2AD\3\2\2\2B@\3\2\2\2BC\3\2\2\2CE\3\2\2\2DB\3")
-        buf.write("\2\2\2EY\7\25\2\2FG\7\22\2\2GH\5\6\4\2HI\7\23\2\2IY\3")
-        buf.write("\2\2\2JK\7\6\2\2KY\5\6\4\bLY\7\32\2\2MN\7\21\2\2NO\7\31")
-        buf.write("\2\2OP\7\30\2\2PQ\7\31\2\2QR\7\30\2\2RS\7\31\2\2ST\7\31")
-        buf.write("\2\2TU\7\30\2\2UY\7\31\2\2VW\7\7\2\2WY\7\31\2\2X<\3\2")
-        buf.write("\2\2XF\3\2\2\2XJ\3\2\2\2XL\3\2\2\2XM\3\2\2\2XV\3\2\2\2")
-        buf.write("Yb\3\2\2\2Z[\f\7\2\2[\\\7\4\2\2\\a\5\6\4\b]^\f\6\2\2^")
-        buf.write("_\7\5\2\2_a\5\6\4\7`Z\3\2\2\2`]\3\2\2\2ad\3\2\2\2b`\3")
-        buf.write("\2\2\2bc\3\2\2\2c\7\3\2\2\2db\3\2\2\2ef\7\26\2\2fg\7\31")
-        buf.write("\2\2gh\7\31\2\2hi\7\31\2\2ij\7\27\2\2j\t\3\2\2\2\13\f")
-        buf.write("\16\35\67:BX`b")
+        buf.write("\3\7\3\66\n\3\f\3\16\39\13\3\3\3\3\3\3\3\3\3\3\3\5\3@")
+        buf.write("\n\3\3\4\3\4\3\4\3\4\7\4F\n\4\f\4\16\4I\13\4\3\4\3\4\3")
+        buf.write("\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4")
+        buf.write("\3\4\3\4\3\4\3\4\3\4\5\4`\n\4\3\4\3\4\3\4\3\4\3\4\3\4")
+        buf.write("\7\4h\n\4\f\4\16\4k\13\4\3\5\3\5\3\5\3\5\3\5\3\5\3\5\2")
+        buf.write("\3\6\6\2\4\6\b\2\2\2\u0085\2\16\3\2\2\2\4?\3\2\2\2\6_")
+        buf.write("\3\2\2\2\bl\3\2\2\2\n\r\7\37\2\2\13\r\5\4\3\2\f\n\3\2")
+        buf.write("\2\2\f\13\3\2\2\2\r\20\3\2\2\2\16\f\3\2\2\2\16\17\3\2")
+        buf.write("\2\2\17\21\3\2\2\2\20\16\3\2\2\2\21\22\7\2\2\3\22\3\3")
+        buf.write("\2\2\2\23\24\7\34\2\2\24\25\7\3\2\2\25@\5\6\4\2\26\27")
+        buf.write("\7\b\2\2\27\30\7\34\2\2\30\31\7\32\2\2\31@\5\b\5\2\32")
+        buf.write("\35\7\t\2\2\33\36\5\6\4\2\34\36\7\36\2\2\35\33\3\2\2\2")
+        buf.write("\35\34\3\2\2\2\36@\3\2\2\2\37 \7\n\2\2 @\5\6\4\2!\"\7")
+        buf.write("\13\2\2\"@\5\6\4\2#$\7\f\2\2$@\5\6\4\2%&\7\r\2\2&@\5\6")
+        buf.write("\4\2\'(\7\16\2\2()\5\6\4\2)*\7\32\2\2*+\5\6\4\2+@\3\2")
+        buf.write("\2\2,-\7\17\2\2-.\5\6\4\2./\7\32\2\2/\60\5\6\4\2\60@\3")
+        buf.write("\2\2\2\61\62\7\20\2\2\62\67\7\36\2\2\63\64\7\32\2\2\64")
+        buf.write("\66\5\6\4\2\65\63\3\2\2\2\669\3\2\2\2\67\65\3\2\2\2\67")
+        buf.write("8\3\2\2\28@\3\2\2\29\67\3\2\2\2:;\7\23\2\2;<\7\34\2\2")
+        buf.write("<=\7\32\2\2=>\7\33\2\2>@\7\33\2\2?\23\3\2\2\2?\26\3\2")
+        buf.write("\2\2?\32\3\2\2\2?\37\3\2\2\2?!\3\2\2\2?#\3\2\2\2?%\3\2")
+        buf.write("\2\2?\'\3\2\2\2?,\3\2\2\2?\61\3\2\2\2?:\3\2\2\2@\5\3\2")
+        buf.write("\2\2AB\b\4\1\2BG\7\26\2\2CD\7\33\2\2DF\7\33\2\2EC\3\2")
+        buf.write("\2\2FI\3\2\2\2GE\3\2\2\2GH\3\2\2\2HJ\3\2\2\2IG\3\2\2\2")
+        buf.write("J`\7\27\2\2KL\7\24\2\2LM\5\6\4\2MN\7\25\2\2N`\3\2\2\2")
+        buf.write("OP\7\6\2\2P`\5\6\4\tQR\7\22\2\2R`\7\34\2\2S`\7\34\2\2")
+        buf.write("TU\7\21\2\2UV\7\33\2\2VW\7\32\2\2WX\7\33\2\2XY\7\32\2")
+        buf.write("\2YZ\7\33\2\2Z[\7\33\2\2[\\\7\32\2\2\\`\7\33\2\2]^\7\7")
+        buf.write("\2\2^`\7\33\2\2_A\3\2\2\2_K\3\2\2\2_O\3\2\2\2_Q\3\2\2")
+        buf.write("\2_S\3\2\2\2_T\3\2\2\2_]\3\2\2\2`i\3\2\2\2ab\f\b\2\2b")
+        buf.write("c\7\4\2\2ch\5\6\4\tde\f\7\2\2ef\7\5\2\2fh\5\6\4\bga\3")
+        buf.write("\2\2\2gd\3\2\2\2hk\3\2\2\2ig\3\2\2\2ij\3\2\2\2j\7\3\2")
+        buf.write("\2\2ki\3\2\2\2lm\7\30\2\2mn\7\33\2\2no\7\33\2\2op\7\33")
+        buf.write("\2\2pq\7\31\2\2q\t\3\2\2\2\13\f\16\35\67?G_gi")
         return buf.getvalue()
 
 
@@ -63,14 +65,16 @@ class PolyParser ( Parser ):
 
     literalNames = [ "<INVALID>", "':='", "'*'", "'+'", "'#'", "'!'", "'color'", 
                      "'print'", "'area'", "'perimeter'", "'vertices'", "'centroid'", 
-                     "'inside'", "'equal'", "'draw'", "'regular'", "'('", 
-                     "')'", "'['", "']'", "'{'", "'}'", "','" ]
+                     "'inside'", "'equal'", "'draw'", "'regular'", "'copy'", 
+                     "'translate'", "'('", "')'", "'['", "']'", "'{'", "'}'", 
+                     "','" ]
 
     symbolicNames = [ "<INVALID>", "ASSIGN", "INTER", "UNION", "BOUND", 
                       "RAND", "COLOR", "PRINT", "AREA", "PERIM", "VERT", 
-                      "CENTR", "INSIDE", "EQUAL", "DRAW", "REGPOLY", "LPAREN", 
-                      "RPAREN", "LSQUARE", "RSQUARE", "LCURLY", "RCURLY", 
-                      "COLON", "NUM", "IDEN", "WS", "QTEXT", "COMMENT" ]
+                      "CENTR", "INSIDE", "EQUAL", "DRAW", "REGPOLY", "COPY", 
+                      "TRANS", "LPAREN", "RPAREN", "LSQUARE", "RSQUARE", 
+                      "LCURLY", "RCURLY", "COLON", "NUM", "IDEN", "WS", 
+                      "QTEXT", "COMMENT" ]
 
     RULE_root = 0
     RULE_stmt = 1
@@ -95,18 +99,20 @@ class PolyParser ( Parser ):
     EQUAL=13
     DRAW=14
     REGPOLY=15
-    LPAREN=16
-    RPAREN=17
-    LSQUARE=18
-    RSQUARE=19
-    LCURLY=20
-    RCURLY=21
-    COLON=22
-    NUM=23
-    IDEN=24
-    WS=25
-    QTEXT=26
-    COMMENT=27
+    COPY=16
+    TRANS=17
+    LPAREN=18
+    RPAREN=19
+    LSQUARE=20
+    RSQUARE=21
+    LCURLY=22
+    RCURLY=23
+    COLON=24
+    NUM=25
+    IDEN=26
+    WS=27
+    QTEXT=28
+    COMMENT=29
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -161,7 +167,7 @@ class PolyParser ( Parser ):
             self.state = 12
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << PolyParser.COLOR) | (1 << PolyParser.PRINT) | (1 << PolyParser.AREA) | (1 << PolyParser.PERIM) | (1 << PolyParser.VERT) | (1 << PolyParser.CENTR) | (1 << PolyParser.INSIDE) | (1 << PolyParser.EQUAL) | (1 << PolyParser.DRAW) | (1 << PolyParser.IDEN) | (1 << PolyParser.COMMENT))) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << PolyParser.COLOR) | (1 << PolyParser.PRINT) | (1 << PolyParser.AREA) | (1 << PolyParser.PERIM) | (1 << PolyParser.VERT) | (1 << PolyParser.CENTR) | (1 << PolyParser.INSIDE) | (1 << PolyParser.EQUAL) | (1 << PolyParser.DRAW) | (1 << PolyParser.TRANS) | (1 << PolyParser.IDEN) | (1 << PolyParser.COMMENT))) != 0):
                 self.state = 10
                 self._errHandler.sync(self)
                 token = self._input.LA(1)
@@ -169,7 +175,7 @@ class PolyParser ( Parser ):
                     self.state = 8
                     self.match(PolyParser.COMMENT)
                     pass
-                elif token in [PolyParser.COLOR, PolyParser.PRINT, PolyParser.AREA, PolyParser.PERIM, PolyParser.VERT, PolyParser.CENTR, PolyParser.INSIDE, PolyParser.EQUAL, PolyParser.DRAW, PolyParser.IDEN]:
+                elif token in [PolyParser.COLOR, PolyParser.PRINT, PolyParser.AREA, PolyParser.PERIM, PolyParser.VERT, PolyParser.CENTR, PolyParser.INSIDE, PolyParser.EQUAL, PolyParser.DRAW, PolyParser.TRANS, PolyParser.IDEN]:
                     self.state = 9
                     self.stmt()
                     pass
@@ -250,6 +256,15 @@ class PolyParser ( Parser ):
         def DRAW(self):
             return self.getToken(PolyParser.DRAW, 0)
 
+        def TRANS(self):
+            return self.getToken(PolyParser.TRANS, 0)
+
+        def NUM(self, i:int=None):
+            if i is None:
+                return self.getTokens(PolyParser.NUM)
+            else:
+                return self.getToken(PolyParser.NUM, i)
+
         def getRuleIndex(self):
             return PolyParser.RULE_stmt
 
@@ -268,7 +283,7 @@ class PolyParser ( Parser ):
         self.enterRule(localctx, 2, self.RULE_stmt)
         self._la = 0 # Token type
         try:
-            self.state = 56
+            self.state = 61
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [PolyParser.IDEN]:
@@ -298,7 +313,7 @@ class PolyParser ( Parser ):
                 self.state = 27
                 self._errHandler.sync(self)
                 token = self._input.LA(1)
-                if token in [PolyParser.BOUND, PolyParser.RAND, PolyParser.REGPOLY, PolyParser.LPAREN, PolyParser.LSQUARE, PolyParser.IDEN]:
+                if token in [PolyParser.BOUND, PolyParser.RAND, PolyParser.REGPOLY, PolyParser.COPY, PolyParser.LPAREN, PolyParser.LSQUARE, PolyParser.IDEN]:
                     self.state = 25
                     self.poly(0)
                     pass
@@ -379,6 +394,19 @@ class PolyParser ( Parser ):
                     _la = self._input.LA(1)
 
                 pass
+            elif token in [PolyParser.TRANS]:
+                self.enterOuterAlt(localctx, 11)
+                self.state = 56
+                self.match(PolyParser.TRANS)
+                self.state = 57
+                self.match(PolyParser.IDEN)
+                self.state = 58
+                self.match(PolyParser.COLON)
+                self.state = 59
+                self.match(PolyParser.NUM)
+                self.state = 60
+                self.match(PolyParser.NUM)
+                pass
             else:
                 raise NoViableAltException(self)
 
@@ -425,6 +453,9 @@ class PolyParser ( Parser ):
         def BOUND(self):
             return self.getToken(PolyParser.BOUND, 0)
 
+        def COPY(self):
+            return self.getToken(PolyParser.COPY, 0)
+
         def IDEN(self):
             return self.getToken(PolyParser.IDEN, 0)
 
@@ -467,76 +498,82 @@ class PolyParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 86
+            self.state = 93
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [PolyParser.LSQUARE]:
-                self.state = 59
-                self.match(PolyParser.LSQUARE)
                 self.state = 64
+                self.match(PolyParser.LSQUARE)
+                self.state = 69
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 while _la==PolyParser.NUM:
-                    self.state = 60
-                    self.match(PolyParser.NUM)
-                    self.state = 61
+                    self.state = 65
                     self.match(PolyParser.NUM)
                     self.state = 66
+                    self.match(PolyParser.NUM)
+                    self.state = 71
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
 
-                self.state = 67
+                self.state = 72
                 self.match(PolyParser.RSQUARE)
                 pass
             elif token in [PolyParser.LPAREN]:
-                self.state = 68
+                self.state = 73
                 self.match(PolyParser.LPAREN)
-                self.state = 69
+                self.state = 74
                 self.poly(0)
-                self.state = 70
+                self.state = 75
                 self.match(PolyParser.RPAREN)
                 pass
             elif token in [PolyParser.BOUND]:
-                self.state = 72
+                self.state = 77
                 self.match(PolyParser.BOUND)
-                self.state = 73
-                self.poly(6)
+                self.state = 78
+                self.poly(7)
+                pass
+            elif token in [PolyParser.COPY]:
+                self.state = 79
+                self.match(PolyParser.COPY)
+                self.state = 80
+                self.match(PolyParser.IDEN)
                 pass
             elif token in [PolyParser.IDEN]:
-                self.state = 74
+                self.state = 81
                 self.match(PolyParser.IDEN)
                 pass
             elif token in [PolyParser.REGPOLY]:
-                self.state = 75
-                self.match(PolyParser.REGPOLY)
-                self.state = 76
-                self.match(PolyParser.NUM)
-                self.state = 77
-                self.match(PolyParser.COLON)
-                self.state = 78
-                self.match(PolyParser.NUM)
-                self.state = 79
-                self.match(PolyParser.COLON)
-                self.state = 80
-                self.match(PolyParser.NUM)
-                self.state = 81
-                self.match(PolyParser.NUM)
                 self.state = 82
-                self.match(PolyParser.COLON)
+                self.match(PolyParser.REGPOLY)
                 self.state = 83
+                self.match(PolyParser.NUM)
+                self.state = 84
+                self.match(PolyParser.COLON)
+                self.state = 85
+                self.match(PolyParser.NUM)
+                self.state = 86
+                self.match(PolyParser.COLON)
+                self.state = 87
+                self.match(PolyParser.NUM)
+                self.state = 88
+                self.match(PolyParser.NUM)
+                self.state = 89
+                self.match(PolyParser.COLON)
+                self.state = 90
                 self.match(PolyParser.NUM)
                 pass
             elif token in [PolyParser.RAND]:
-                self.state = 84
+                self.state = 91
                 self.match(PolyParser.RAND)
-                self.state = 85
+                self.state = 92
                 self.match(PolyParser.NUM)
                 pass
             else:
                 raise NoViableAltException(self)
 
             self._ctx.stop = self._input.LT(-1)
-            self.state = 96
+            self.state = 103
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,8,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
@@ -544,37 +581,37 @@ class PolyParser ( Parser ):
                     if self._parseListeners is not None:
                         self.triggerExitRuleEvent()
                     _prevctx = localctx
-                    self.state = 94
+                    self.state = 101
                     self._errHandler.sync(self)
                     la_ = self._interp.adaptivePredict(self._input,7,self._ctx)
                     if la_ == 1:
                         localctx = PolyParser.PolyContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_poly)
-                        self.state = 88
-                        if not self.precpred(self._ctx, 5):
+                        self.state = 95
+                        if not self.precpred(self._ctx, 6):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
-                        self.state = 89
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 6)")
+                        self.state = 96
                         self.match(PolyParser.INTER)
-                        self.state = 90
-                        self.poly(6)
+                        self.state = 97
+                        self.poly(7)
                         pass
 
                     elif la_ == 2:
                         localctx = PolyParser.PolyContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_poly)
-                        self.state = 91
-                        if not self.precpred(self._ctx, 4):
+                        self.state = 98
+                        if not self.precpred(self._ctx, 5):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 4)")
-                        self.state = 92
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
+                        self.state = 99
                         self.match(PolyParser.UNION)
-                        self.state = 93
-                        self.poly(5)
+                        self.state = 100
+                        self.poly(6)
                         pass
 
              
-                self.state = 98
+                self.state = 105
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,8,self._ctx)
 
@@ -623,15 +660,15 @@ class PolyParser ( Parser ):
         self.enterRule(localctx, 6, self.RULE_color)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 99
+            self.state = 106
             self.match(PolyParser.LCURLY)
-            self.state = 100
+            self.state = 107
             self.match(PolyParser.NUM)
-            self.state = 101
+            self.state = 108
             self.match(PolyParser.NUM)
-            self.state = 102
+            self.state = 109
             self.match(PolyParser.NUM)
-            self.state = 103
+            self.state = 110
             self.match(PolyParser.RCURLY)
         except RecognitionException as re:
             localctx.exception = re
@@ -655,11 +692,11 @@ class PolyParser ( Parser ):
 
     def poly_sempred(self, localctx:PolyContext, predIndex:int):
             if predIndex == 0:
-                return self.precpred(self._ctx, 5)
+                return self.precpred(self._ctx, 6)
          
 
             if predIndex == 1:
-                return self.precpred(self._ctx, 4)
+                return self.precpred(self._ctx, 5)
          
 
 

@@ -78,6 +78,9 @@ class Point:
     def __sub__(self, q):
         return Vector(self.x - q.x, self.y - q.y)
 
+    def __add__(self, u):
+        return Point(self.x + u.x, self.y + u.y)
+
     @staticmethod
     def distance(p, q):
         return (q - p).norm()
@@ -396,6 +399,9 @@ class ConvexPolygon:
 
         return ConvexPolygon([Point(left, bottom), Point(right, bottom),
                               Point(right, top), Point(left, top)], color=color, sortedList=True)
+
+    def translate(self, u):
+        self.points = [p + u for p in self.points]
 
     @staticmethod
     def convexUnion(poly1, poly2, color=Color(), tol=1e-9):
