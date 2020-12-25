@@ -1,5 +1,4 @@
-__pycache__/*
+*__pycache__/*
 test.py
 bot/token.txt
 output.png
-cl/__pycache__/*
