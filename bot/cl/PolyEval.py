@@ -78,8 +78,7 @@ class PolyEval(PolyVisitor):
         if type(l[0]) == PolyParser.PolyContext:
             opType = l[1].getSymbol().type
             if opType == PolyParser.INTER:
-                print('Warning: to be replaced by the intersection.')
-                return ConvexPolygon.convexUnion(self.visit(l[0]), self.visit(l[2]))
+                return ConvexPolygon.intersect(self.visit(l[0]), self.visit(l[2]))
 
             elif opType == PolyParser.UNION:
                 return ConvexPolygon.convexUnion(self.visit(l[0]), self.visit(l[2]))
