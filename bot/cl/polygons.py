@@ -4,22 +4,26 @@ import random
 import math
 
 
-# Given two lists xs and ys, and a 'shift' value, returns a generator that zips
-#  xs and ys, with ys starting by the `shift`-th element and going back to the beginning.
-#
-# >>> xs = [1, 2, 3, 4]
-# >>> ys = [10, 20, 30]
-# >>> [z for z in shiftZip(xs, ys, 1)]
-# [(1, 20), (2, 30), (3, 10)]
 def shiftZip(xs, ys, shift):
+    """
+    Given two lists xs and ys, and a 'shift' value, returns a generator that zips
+     xs and ys, with ys starting by the `shift`-th element and going back to the
+     beginning.
+
+    Example:
+     >>> xs = [1, 2, 3, 4]
+     >>> ys = [10, 20, 30]
+     >>> [z for z in shiftZip(xs, ys, 1)]
+     [(1, 20), (2, 30), (3, 10)]
+    """
     n = len(ys)
     m = min(len(xs), n)
     for i in range(0, m):
         yield xs[i], ys[(i + shift) % n]
 
 
-# The well-known sign function
 def sign(x, tol=1e-9):
+    """Returns +1 if x is positive, -1 if x is negative, and 0 otherwise."""
     if eq(x, 0, tol):
         return 0
     elif lt(x, 0, tol):
@@ -28,16 +32,16 @@ def sign(x, tol=1e-9):
         return 1
 
 
-# Given a list, returns a generator that cycles the list infinitely.
 def cycle(xs):
+    """Given a list, returns a generator that cycles the list infinitely."""
     n = len(xs)
     while True:
         for i in range(0, n):
             yield xs[i]
 
 
-# Returns the minimum of a list using a comparison function.
 def minWithComp(xs, comp=lambda x, y: x < y):
+    """Returns the minimum of a list using a comparison function."""
     if not xs:
         return None
 
@@ -48,13 +52,17 @@ def minWithComp(xs, comp=lambda x, y: x < y):
     return theMin
 
 
-# Given a list and a comparison function, returns the list rearranged so that it
-#  starts with the minimum while respecting the initial order of the list.
-# Pre: the list has only one minimum.
-#
-# >>> beginWithMin([4, 1, 5, 0, 6, 2])
-# >>> [0, 6, 2, 4, 1, 5]
 def beginWithMin(xs, comp=lambda x, y: x < y):
+    """
+    Given a list and a comparison function, returns the list rearranged so that it
+     starts with the minimum while respecting the initial order of the list.
+
+    Pre: the list has only one minimum.
+
+    Example:
+     >>> beginWithMin([4, 1, 5, 0, 6, 2])
+     >>> [0, 6, 2, 4, 1, 5]
+    """
     if not xs:
         return xs
 
@@ -68,82 +76,94 @@ def beginWithMin(xs, comp=lambda x, y: x < y):
     return xs[iMin:] + xs[:iMin]
 
 
-# 'Less than' operator for floating point operations.
 def lt(x, y, tol):
+    """'Less than' operator for floating point operations."""
     return x - y < -tol
 
 
-# 'Greater than' operator for floating point operations.
 def gt(x, y, tol):
+    """'Greater than' operator for floating point operations."""
     return x - y > tol
 
 
-# 'Equal to' operator for floating point operations.
 def eq(x, y, tol):
+    """'Equal to' operator for floating point operations."""
     return abs(x - y) <= tol
 
 
-# 'Not equal to' operator for floating point operations.
 def ne(x, y, tol):
+    """'Not equal to' operator for floating point operations."""
     return abs(x - y) > tol
 
 
-# 'Less or equal than' operator for floating point operations.
 def le(x, y, tol):
+    """'Less or equal than' operator for floating point operations."""
     return x - y < tol
 
 
-# 'Greater or equal' operator for floating point operations.
 def ge(x, y, tol):
+    """'Greater or equal' operator for floating point operations."""
     return x - y > -tol
 
 
-# Class for handling points.
 class Point:
-    # Basic contruction.
+    """Class for handling points."""
+
     def __init__(self, x, y):
+        """Basic contructor."""
         self.x = x
         self.y = y
 
-    # This is the method that 'str' and 'print()' use.
     def __repr__(self):
+        """
+        Converts Point to its string representation.
+
+        Note: This is the method that 'str()' and 'print()' use
+        """
         return '{:.3f} {:.3f}'.format(self.x, self.y)
 
-    # Overloading the '-' operator so that p - q is the corresponding vector.
     def __sub__(self, q):
+        """
+        Overload of the '-' operator so that p - q returns the corresponding vector.
+        """
         return Vector(self.x - q.x, self.y - q.y)
 
-    # Overloading the '+' for translation. If u is a vector, p + u is a point
-    #  translated according to the vector u.
     def __add__(self, u):
+        """
+        Overload of the '+' operator for translation. If u is a vector, p + u is
+         a point translated according to the vector u.
+        """
         return Point(self.x + u.x, self.y + u.y)
 
-    # Returns the distance between two points.
     @staticmethod
     def distance(p, q):
+        """Returns the distance between two points."""
         return (q - p).norm()
 
-    # A point is equal to another point if the distance between those points is 0.
     @staticmethod
     def isEqual(p, q, tol=1e-9):
+        """Returns whether a point is equal to another point."""
+        # A point is equal to another point if the distance between those points is 0.
         return eq(Point.distance(p, q), 0, tol)
 
-    # Returns the orientation of the triangle given by three points.
-    # Note:
-    # 'cross' is the third coordinate of the vector w = v1 x v2,
-    #  where v1 = p2 - p1 and v2 = p3 - p1. This coordinate gives us the
-    #  orientation of the basis {v1, v2}:
-    #  1. If this coordinate is positive, {v1, v2} is positive-oriented
-    #  2. If this coordinate is negative, {v1, v2} is negative-oriented
-    #  3. If this coordinate is 0, {v1, v2} is actually not a basis
-    #
-    # As a consequence, this also gives the orientation of the triangle given by
-    #  p1 --> p2 --> p3 --> p1.
-    #  1. If `orientationValue` is positive, the triangle is counter-clockwise oriented.
-    #  2. If `orientationValue` is negative, the triangle is clockwise oriented.
-    #  3. If `orientationValue` is zero, the triangle is degenerate.
     @staticmethod
     def orientation(p1, p2, p3, tol=1e-9):
+        """
+        Returns the orientation of the triangle given by three points.
+
+        Note: 'cross' is the third coordinate of the vector w = v1 x v2,
+         where v1 = p2 - p1 and v2 = p3 - p1. This coordinate gives us the
+         orientation of the basis {v1, v2}:
+          1. If this coordinate is positive, {v1, v2} is positive-oriented
+          2. If this coordinate is negative, {v1, v2} is negative-oriented
+          3. If this coordinate is 0, {v1, v2} is actually not a basis
+
+        As a consequence, this also gives the orientation of the triangle given by
+         p1 --> p2 --> p3 --> p1.
+         1. If `orientationValue` is positive, the triangle is counter-clockwise oriented.
+         2. If `orientationValue` is negative, the triangle is clockwise oriented.
+         3. If `orientationValue` is zero, the triangle is degenerate.
+        """
         cross = Vector.crossProductZ(p2 - p1, p3 - p1)
         if eq(cross, 0, tol):
             return Vector.Orien.DEGEN
@@ -152,23 +172,29 @@ class Point:
         else:  # gt(cross, 0, tol)
             return Vector.Orien.CCW
 
-    # Generates a random point.
     @staticmethod
     def random(xdom=(0, 1), ydom=(0, 1)):
+        """Generates a random point."""
         return Point(xdom[0] + random.random()*(xdom[1] - xdom[0]),
                      ydom[0] + random.random()*(ydom[1] - ydom[0]))
 
 
-# Class for handling mathematical vectors
 class Vector:
-    # Orientation class defined as a simple enum for better readibility.
+    """Class for handling mathematical vectors"""
     class Orien:
-        CCW = 1    # Counter-clockwise
-        DEGEN = 0  # Degenerate
-        CW = -1    # Clockwise
+        """
+        Orientation class defined as a simple enum for better readibility.
 
-    # Constructs a vector either with two points, or with the x and y coordinates.
+        Vector.Orien.CCW: Counter-clockwise
+        Vector.Orien.DEGEN: Degenerate
+        Vector.Orien.CW: clockwise
+        """
+        CCW = 1
+        DEGEN = 0
+        CW = -1
+
     def __init__(self, x, y):
+        """Constructs a vector either with two points, or with its x and y coordinates."""
         if isinstance(x, Point) and isinstance(y, Point):
             self.x = y.x - x.x
             self.y = y.y - x.y
@@ -176,79 +202,94 @@ class Vector:
             self.x = x
             self.y = y
 
-    # This is the method that 'str' and 'print()' use.
     def __repr__(self):
+        """
+        Converts Vector to its string representation.
+
+        Note: This is the method that 'str()' and 'print()' use.
+        """
         return '({:.3f}, {:.3f})'.format(self.x, self.y)
 
-    # Euclidean norm of the vector
     def norm(self):
+        """Returns the Euclidean norm of the vector."""
         return math.sqrt(self.x**2 + self.y**2)
 
-    # Returns the Euclidean dot product of two vectors.
     @staticmethod
     def dotProduct(u, v):
+        """Returns the Euclidean dot product of two vectors."""
         return u.x*v.x + u.y*v.y
 
-    # Returns the z coordinate of the cross product of the vectors u and v.
     @staticmethod
     def crossProductZ(u, v):
+        """Returns the z coordinate of the cross product of the vectors u and v."""
         return u.x*v.y - u.y*v.x
 
-    # Returns the (oriented) angle between u and v
     @staticmethod
     def computeAngle(u, v):
+        """Returns the (oriented) angle between u and v."""
         return math.acos(Vector.dotProduct(u, v)/(u.norm()*v.norm()))
 
 
-# Class for handling edges of polygons
 class Edge:
-    # Intersection class defined as a simple enum for better readibility.
+    """Class for handling edges of polygons."""
     class Inter:
-        CROSS = 1  # Cross intersection. Two edges intersect in an X shape.
-        DEGEN = 0  # Degenerate intersection. Two edges intersect but are collinear.
-        NONE = -1  # No intersection between the two edges.
+        """
+        Intersection class defined as a simple enum for better readibility.
 
-    # Simple constructor using two points
+        Edge.Inter.CROSS: Cross intersection. Two edges intersect in an X shape.
+        Edge.Inter.DEGEN: Degenerate intersection. Two edges intersect but are collinear.
+        Edge.Inter.NONE: No intersection between the two edges.
+        """
+        CROSS = 1
+        DEGEN = 0
+        NONE = -1
+
     def __init__(self, p, q):
+        """Constructs an edge using two points."""
         self.p = p
         self.q = q
 
-    # This is the method that 'str' and 'print()' use.
     def __repr__(self):
+        """
+        Converts Edge to its string representation.
+
+        Note: This is the method that 'str()' and 'print()' use
+        """
         return '{:} --> {:}'.format(self.p, self.q)
 
-    # Returns the length of an edge, that is the distance between its two points.
     def getLength(self):
+        """Returns the length of an edge, that is the distance between its two points."""
         return Point.distance(self.p, self.q)
 
-    # True if the point r is in the left half plane of the edge, false otherwise.
     def isInLeftHalfPlane(self, r, tol=1e-9):
+        """Returns true if the given point is in the left half plane of the edge,
+        and false otherwise."""
         u = self.q - self.p
         v = r - self.p
         return ge(Vector.crossProductZ(u, v), 0, tol)
 
-    # Returns whether a point is inside the edge.
-    # Note: a point is inside an edge if and only if the sum of the distance
-    #  between the point and the extremes of the edge is equal to the length
-    #  of the edge.
     def isPointInside(self, p, tol=1e-9):
+        """Returns whether a point is inside the edge."""
+        # Note: a point is inside an edge if and only if the sum of the distance
+        #  between the point and the extremes of the edge is equal to the length
+        #  of the edge.
         return eq(Point.distance(self.p, p) + Point.distance(p, self.q), self.getLength(), tol)
 
-    # Returns the (oriented) angle between e1 and e2.
     @staticmethod
     def computeAngle(e1, e2):
+        """Returns the (oriented) angle between e1 and e2."""
         return Vector.computeAngle(e1.q - e1.p, e2.q - e2.p)
 
-    # Returns whether two edges are equal.
-    # Note: two edges are equal if their extremes are equal.
     @staticmethod
     def isEqual(e1, e2, tol=1e-9):
+        """Returns whether two edges are equal."""
+        # Note: two edges are equal if their extremes are equal.
         return (Point.isEqual(e1.p, e2.p, tol) and Point.isEqual(e1.q, e2.q, tol)) \
             or (Point.isEqual(e1.p, e2.q, tol) and Point.isEqual(e1.q, e2.p, tol))
 
-    # Returns the kind of intersection that two edges have.
     @staticmethod
     def hasIntersection(e1, e2, tol=1e-9):
+        """Returns the kind of intersection that two edges have using Edge.Inter."""
         ori1p = Point.orientation(e1.p, e1.q, e2.p, tol)
         ori1q = Point.orientation(e1.p, e1.q, e2.q, tol)
         ori2p = Point.orientation(e2.p, e2.q, e1.p, tol)
@@ -270,10 +311,12 @@ class Edge:
             else:
                 return Edge.Inter.NONE
 
-    # Returns the kind of intersection of two edges along with a list of the
-    #  points of intersection.
     @staticmethod
     def intersect(e1, e2, tol=1e-9):
+        """
+        Returns the kind of intersection of two edges using Edge.Inter, as well
+         as a list of the points of intersection.
+        """
         interType = Edge.hasIntersection(e1, e2, tol)
         if interType == Edge.Inter.NONE:
             return Edge.Inter.NONE, []
@@ -316,44 +359,63 @@ class Edge:
             return Edge.Inter.CROSS, [Point(px, py)]
 
 
-# Class created to handle colors in an easier way to read. The values r, g and b
-#  correspond to the red, green and blue channels of the RGB color space, and
-#  they are assumed to be between 0 and 1.
 class Color:
-    # Simple constructor, defaults to black.
+    """
+    Class created to handle colors in an easier way to read.
+
+    The values r, g and b correspond to the red, green and blue channels of the
+     RGB color space, and they are assumed to be between 0 and 1.
+    """
+
     def __init__(self, r=0, g=0, b=0):
+        """Constructs a color object using its RGB values. Defaults to black color."""
         self.r = r
         self.g = g
         self.b = b
 
-    # This is the method that 'str' and 'print()' use.
     def __repr__(self):
+        """
+        Converts Color to its string representation.
+
+        Note: This is the method that 'str()' and 'print()' use
+        """
         return '{{{:.3f} {:.3f} {:.3f}}}'.format(self.r, self.g, self.b)
 
-    # Converts to an RGB tuple whose values range between 0 and 255 (8 bits per color channel).
     def toIntegerTuple(self):
+        """
+        Converts to an RGB tuple whose values range between 0 and 255
+        (8 bits per color channel).
+        """
         return math.floor(255*self.r), math.floor(255*self.g), math.floor(255*self.b)
 
 
-# Class to handle convex polygons. Each polygon is represented as a list of its
-#  vertices, which are ordered and counter-clockwise oriented, starting from the
-#  smaller vertex in lexicographic order.
 class ConvexPolygon:
-    # Constructor for the ConvexPolygon class.
-    # If the constructor is called with sortedList=True, then the given points
-    #  are assumed to be the vertices of the polygon and are also assumed to be
-    #  arranged in the correct way. Hence, no further computation is done other
-    #  than assignments.
-    # Otherwise, if the constructor is called with sortedList=False, the points
-    #  are used to generate the corresponding convex hull using Graham's scan,
-    #  which has time complexity O(nlogn) for n = number of points.
+    """
+    Class to handle convex polygons.
+
+    Each polygon is represented as a list of its vertices, which are ordered and
+     counter-clockwise oriented, starting from the smaller vertex in
+     lexicographic order.
+    """
+
     def __init__(self, points=[], color=Color(), sortedList=False, tol=1e-9):
+        """
+        Constructor of the ConvexPolygon class.
+
+        If the constructor is called with sortedList=True, then the given points
+         are assumed to be the vertices of the polygon and are also assumed to be
+         arranged in the correct way. Hence, no further computation is done other
+         than assignments.
+        Otherwise, if the constructor is called with sortedList=False, the points
+         are used to generate the corresponding convex hull using Graham's scan,
+         which has time complexity O(nlogn) for n = number of points.
+        """
         self.color = color
         if sortedList or not points:
             self.points = points
             return
 
-        # Lexicographic order
+        # Returns whether p is strictly lexicographically smaller than q
         def initialComp(p, q):
             return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
 
@@ -393,21 +455,28 @@ class ConvexPolygon:
 
         self.points = [p0] + stack
 
-    # This is the method that the function `print()` uses
     def __repr__(self):
+        """
+        Converts ConvexPolygon to its string representation.
+
+        Note: This is the method that 'str()' and 'print()' use
+        """
         n = self.numberOfVertices()
         if n == 0:
             return ''
         else:
             return str(self.points[0]) + ' ' + ' '.join([str(self.points[i]) for i in range(-1, -n, -1)])
 
-    # Returns the number of vertices of the polygon.
     def numberOfVertices(self):
+        """Returns the number of vertices of the polygon."""
         return len(self.points)
 
-    # Returns whether a given point is inside the polygon in O(log n) time
-    #  complexity, where n = number of points.
     def isPointInside(self, p, tol=1e-9):
+        """
+        Returns whether a given point is inside the polygon.
+
+        The time complexity of this method is O(log n), where n = number of points.
+        """
         n = self.numberOfVertices()
         if n == 0:
             return False
@@ -447,43 +516,60 @@ class ConvexPolygon:
 
         return binarySlicing(1, n - 1)
 
-    # Returns whether a given polygon is inside our polygon. Uses the 'intersect'
-    #  method due to its O(n + m) time complexity, where n and m are the number
-    #  of points of the polygons.
-    # Note: This method could also be implemented checking whether each of the
-    #  points of the given polygon are inside our polygon with the 'isPointInside'
-    #  method, but that would give us O(mlogn) time complexity, which is worse.
     def isPolygonInside(self, poly, tol=1e-9):
+        """
+        Returns whether a given polygon is inside our polygon.
+
+        This method has O(n + m) time complexity, where n and m are the number
+        of vertices of the polygons.
+        """
+        # Note: This method could also be implemented checking whether each of the
+        #  points of the given polygon are inside our polygon with the 'isPointInside'
+        #  method, but that would give us O(mlogn) time complexity, which is worse.
         inter = ConvexPolygon.intersect(self, poly)
         return ConvexPolygon.isEqual(inter, poly)
 
-    # Returns a list with the edges of the polygon.
     def edges(self):
+        """Returns a list with the edges of the polygon."""
         n = self.numberOfVertices()
         if n <= 1:
-            return []
+            return
         elif n == 2:
             return [Edge(self.points[0], self.points[1])]
         else:
             return [Edge(p, q) for (p, q) in shiftZip(self.points, self.points, 1)]
 
-    # Returns the perimeter of the polygon.
     def perimeter(self):
+        """Returns the perimeter of the polygon."""
         return sum([e.getLength() for e in self.edges()])
 
     def isRegular(self, tol=1e-9):
+        """
+        Returns whether the polygon is regular or not.
+
+        This method works by checking if all the inner angles are the same and the
+        length of all the edges is also the same.
+        """
         if self.numberOfVertices() <= 2:
             return True
 
         edges = self.edges()
         expectedAngle = 2*math.pi/n
-        expectedLength = edges[0].getLength()  # Arbitrary
+        expectedLength = edges[0].getLength()  # Arbitrary, we could have chosen the i-th.
 
+        # Using a generator with all(), means that whenever one of the conditions
+        #  is not satisfied, it will immediately return 'False' without having
+        #  to compute the next ones
         return all(eq(Edge.computeAngle(e1, e2), expectedAngle, tol) and
                    eq(e1.getLength(), expectedLength, tol)
                    for (e1, e2) in shiftZip(edges, edges, 1))
 
     def area(self):
+        """
+        Returns the area of the polygon.
+
+        This method is linear in time and uses Green's theorem of integral calculus.
+        """
         if self.numberOfVertices() <= 2:
             return 0
 
@@ -492,10 +578,14 @@ class ConvexPolygon:
         return sum([x*y for (x, y) in shiftZip(xs, ys, -1)])/2
 
     def centroid(self):
+        """Returns the centroid of the polygon."""
+        # A for loop would be more efficient in this case, but a list
+        #  comprehension has been used to showcase its usage.
         n = self.numberOfVertices()
         return Point(sum([p.x for p in self.points])/n, sum([p.y for p in self.points])/n)
 
     def boundingBox(self, color=Color(), tol=1e-9):
+        """Returns the bounding box of the polygon as a polygon of the given color."""
         n = self.numberOfVertices()
         if n <= 1:
             return ConvexPolygon([], color=color, sortedList=True)
@@ -503,7 +593,7 @@ class ConvexPolygon:
             # Defined for readibility
             x0, y0 = self.points[0].x, self.points[0].y
             x1, y1 = self.points[1].x, self.points[1].y
-            if eq(x0, x1, tol) or eq(y0, y1, tol):
+            if eq(x0, x1, tol) or eq(y0, y1, tol):  # Degenerate case
                 return ConvexPolygon([], color=color, sortedList=True)
 
         top = -math.inf
@@ -520,14 +610,34 @@ class ConvexPolygon:
                               Point(right, top), Point(left, top)], color=color, sortedList=True)
 
     def translate(self, u):
+        """
+        Translates the whole polygon by a given vector.
+
+        Note: this method modifies the polygon.
+        """
         self.points = [p + u for p in self.points]
 
     @staticmethod
     def convexUnion(poly1, poly2, color=Color(), tol=1e-9):
+        """
+        Returns the convex union of two polygons.
+
+        It does so by computing the convex hull of its vertices, which has a
+        O((n + m)log(n + m)) time complexity, where n and m are the number of
+        vertices of the polygons.
+        """
         return ConvexPolygon(poly1.points + poly2.points, color=color, tol=tol)
 
     @staticmethod
     def isEqual(poly1, poly2, tol=1e-9):
+        """
+        Returns whether two given polygons are equal.
+
+        Note: since the way in which the vertices of the polygons are arranged in
+         the self.points lists is unique, it suffices to compare the polygons vertex
+         per vertex, which gives us a O(n) time complexity, where n is the number of
+         vertices.
+        """
         if poly1.numberOfVertices() != poly2.numberOfVertices():
             return False
 
@@ -539,11 +649,19 @@ class ConvexPolygon:
 
     @staticmethod
     def random(n, xdom=(0, 1), ydom=(0, 1), color=Color(), tol=1e-9):
+        """Generates a random polygon."""
         points = [Point.random(xdom=xdom, ydom=ydom) for _ in range(0, n)]
         return ConvexPolygon(points, color=color, tol=tol)
 
     @staticmethod
     def genRegularPolygon(n=0, r=1, c=Point(0, 0), phase=0, color=Color()):
+        """
+        Generates a regular polygon with n vertices, radius r and center c.
+
+        By default, the righ-most vertex of the polygon will lie on the line
+        {y = c.y}. However, it can be rotated using the phase parameter, which
+        takes an angle in radians.
+        """
         if n == 0:
             return ConvexPolygon([], color=color, sortedList=True)
         if n == 1:
@@ -562,6 +680,15 @@ class ConvexPolygon:
 
     @staticmethod
     def boundaries(polys):
+        """
+        Computes the boundaries of a list of polygons.
+
+        In other words, it returns the left-most, bottom.most, right-most and
+         top-most coordinates of the vertices of the given polygons.
+
+        Note: If the list is empty or only has 0-gons, then it returns left = math.inf,
+         bottom = math.inf, right = -math.inf and top = -math.inf
+        """
         left = math.inf
         bottom = math.inf
         right = -math.inf
@@ -575,11 +702,23 @@ class ConvexPolygon:
 
         return left, bottom, right, top
 
-    # O(n + m)
     @staticmethod
     def intersect(poly1, poly2, color=Color(), tol=1e-9):
+        """
+        Computes the intersection of two given polygons.
+
+        The algorithm implemented in this method is adapted from the intersection
+        of convex polygons algorithm described in the paper by O'Rourke, Chien
+        et al. This algorithm has O(n + m) time complexity, where n and m are
+        the number of vertices of the polygons.
+        """
+
+        # Defined just to make code easier to read
         emptyPoly = ConvexPolygon([], color=color, sortedList=True)
 
+        # Function defined to handle the trivial cases, that is n1 <= 2 or n2 <= 2.
+        #  The purpose of this function is to prevent duplicated code by ensuring
+        #  that sn1 <= sn2.
         def trivialCases(spoly1, spoly2, sn1, sn2):
             if sn1 == 0:
                 return emptyPoly
@@ -603,6 +742,7 @@ class ConvexPolygon:
         n1 = poly1.numberOfVertices()
         n2 = poly2.numberOfVertices()
 
+        # Handling of trivial cases
         if (n1 == 2 and n2 >= 3):
             e1 = Edge(poly1.points[0], poly1.points[1])
             for e2 in poly2.edges():
@@ -621,11 +761,13 @@ class ConvexPolygon:
             else:
                 return trivialCases(poly2, poly1, n2, n1)
 
+        # Handling of the general case
         class Place:
             inPoly1 = -1
             unknown = 0
             inPoly2 = 1
 
+        # Returns true if p is strictly lexicographically smaller than q
         def comp(p, q):
             return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
 
@@ -694,6 +836,13 @@ class ConvexPolygon:
 
     @staticmethod
     def draw(polys=[], fileName='output.png', sideLength=400, margin=1, bg=Color(1, 1, 1), show=False, tol=1e-9):
+        """
+        Draws a list of polygons on a square image.
+
+        By default, the file name is 'output.png', the side length of the image
+        is 400, the drawing margin is 1, the background color is white, and the
+        image is not automatically shown in a new window.
+        """
         img = Image.new('RGB', (sideLength, sideLength), bg.toIntegerTuple())
         dib = ImageDraw.Draw(img)
 
@@ -705,9 +854,12 @@ class ConvexPolygon:
 
         left, bottom, right, top = ConvexPolygon.boundaries(polys)
 
-        if eq(left, right, tol) and eq(bottom, top, tol):
+        # Degenerate cases
+        if left == math.inf or eq(left, right, tol) and eq(bottom, top, tol):
             def fitToCanvas(poly):
                 return [(sideLength/2, sideLength/2) for p in poly.points]
+
+        # General case
         else:
             xspan = right - left
             yspan = top - bottom
