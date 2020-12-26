@@ -41,7 +41,7 @@ class PolyEval(PolyVisitor):
                 if outi.startswith(imagePrefix):
                     imageFileNames.append(outi[len(imagePrefix):-1])
                 elif outi.startswith(textPrefix):
-                    output = output + outi[len(imagePrefix):]
+                    output = output + outi[len(imagePrefix)-1:]
                 else:
                     output = output + outi
         return output, imageFileNames
