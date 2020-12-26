@@ -30,15 +30,29 @@ def minWithComp(xs, comp=lambda x, y: x < y):
         return None
 
     theMin = xs[0]
-    n = len(xs)
-    for i in range(1, n):
-        if comp(xs[i], theMin):
-            theMin = xs[i]
+    for x in xs[1:]:
+        if comp(x, theMin):
+            theMin = x
     return theMin
 
 
 def maxWithComp(xs, comp=lambda x, y: x > y):
     return minWithComp(xs, comp=comp)
+
+
+# Pre: there is only one minimum
+def beginWithMin(xs, comp=lambda x, y: x < y):
+    if not xs:
+        return xs
+
+    theMin = xs[0]
+    iMin = 0
+    n = len(xs)
+    for i in range(1, n):
+        if comp(xs[i], theMin):
+            theMin = xs[i]
+            iMin = i
+    return xs[iMin:] + xs[:iMin]
 
 
 def lt(x, y, tol):
@@ -215,22 +229,27 @@ class Edge:
             def comp(p, q):
                 return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
 
-            points = [e1.p, e1.q, e2.p, e2.q]
-            mi = minWithComp(points, comp)
-            ma = maxWithComp(points, lambda p, q: not comp(p, q))
-            spoints = [p for p in points if not Point.isEqual(
-                mi, p, tol) and not Point.isEqual(ma, p, tol)]
+            ce1 = copy.deepcopy(e1)
+            ce2 = copy.deepcopy(e2)
 
-            if not spoints:
-                return Edge.Inter.DEGEN, [copy.deepcopy(mi), copy.deepcopy(ma)]
-            elif Point.isEqual(spoints[0], spoints[1], tol):
-                return Edge.Inter.DEGEN, [copy.deepcopy(spoints[0])]
+            # Changing so that the points in ce1 and ce2 are sorted and ce1 is
+            #  the edge with a smaller p
+            if comp(ce1.q, ce1.p):
+                ce1.p, ce1.q = ce1.q, ce1.p
+            if comp(ce2.q, ce2.p):
+                ce2.p, ce2.q = ce2.q, ce2.p
+            if comp(ce2.p, ce1.p):
+                ce1, ce2 = ce2, ce2
+
+            if comp(ce1.q, ce2.p):
+                return Edge.Inter.DEGEN, []
+            elif Point.isEqual(ce1.q, ce2.p, tol):
+                return Edge.Inter.DEGEN, [ce1.q]
             else:
-                p1 = spoints[0]
-                p2 = spoints[1]
-                if comp(p2, p1):
-                    p1, p2 = p2, p1
-                return Edge.Inter.DEGEN, [copy.deepcopy(p1), copy.deepcopy(p2)]
+                if comp(ce1.q, ce2.q):
+                    return Edge.Inter.DEGEN, [ce2.p, ce1.q]
+                else:
+                    return Edge.Inter.DEGEN, [ce2.p, ce2.q]
 
         if interType == Edge.Inter.CROSS:
             den = (e1.p.x - e1.q.x)*(e2.p.y - e2.q.y) - (e1.p.y - e1.q.y)*(e2.p.x - e2.q.x)
@@ -460,29 +479,47 @@ class ConvexPolygon:
 
         return left, bottom, right, top
 
-    # Not working yet, needs to be taken care of
+    # O(n + m)
     @staticmethod
     def intersect(poly1, poly2, color=Color(), tol=1e-9):
-        emptyPoly = ConvexPolygon([], color=Color(), sortedList=True)
+        emptyPoly = ConvexPolygon([], color=color, sortedList=True)
 
         def trivialCases(spoly1, spoly2, sn1, sn2):
-            if sn2 == 0:
+            if sn1 == 0:
                 return emptyPoly
             if sn1 == 1:
-                if poly2.isPointInside(spoly1.points[0]):
-                    return copy.deepcopy(spoly1)
+                if spoly2.isPointInside(spoly1.points[0]):
+                    spoly1Copy = copy.deepcopy(spoly1)
+                    spoly1Copy.color = color
+                    return spoly1Copy
                 else:
                     return emptyPoly
             if sn1 == 2:
-                if poly2.isPointInside(spoly1.points[0]) and poly2.isPointInside(spoly1.points[1]):
-                    return copy.deepcopy(spoly1)
-                else:
-                    print('Not implemented.')
+                e1 = Edge(spoly1.points[0], spoly1.points[1])
+                e2 = Edge(spoly2.points[0], spoly2.points[1])
+                interType, ps = Edge.intersect(e1, e2)
+                if interType == Edge.Inter.NONE:
                     return emptyPoly
+                else:
+                    return ConvexPolygon(copy.deepcopy(ps),
+                                         color=color, sortedList=True)
 
         n1 = poly1.getNumberOfVertices()
         n2 = poly2.getNumberOfVertices()
-        if n1 <= 2 or n2 <= 2:
+
+        if (n1 == 2 and n2 >= 3):
+            e1 = Edge(poly1.points[0], poly1.points[1])
+            for e2 in poly2.getEdges():
+                interType, ps = Edge.intersect(e1, e2)
+                if interType == Edge.Inter.DEGEN:
+                    return ConvexPolygon(ps, color=color, sortedList=True)
+        elif (n1 >= 3 and n2 == 2):
+            e2 = Edge(poly2.points[0], poly2.points[1])
+            for e1 in poly1.getEdges():
+                interType, ps = Edge.intersect(e1, e2)
+                if interType == Edge.Inter.DEGEN:
+                    return ConvexPolygon(ps, color=color, sortedList=True)
+        elif (n1 <= 2 or n2 <= 2):
             if n1 <= n2:
                 return trivialCases(poly1, poly2, n1, n2)
             else:
@@ -492,6 +529,9 @@ class ConvexPolygon:
             inPoly1 = -1
             unknown = 0
             inPoly2 = 1
+
+        def comp(p, q):
+            return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
 
         gen1 = cycle(poly1.points)
         gen2 = cycle(poly2.points)
@@ -509,12 +549,13 @@ class ConvexPolygon:
                 if len(inter) >= 2 and Edge(inter[-2], inter[-1]).isPointInside(p):
                     inter.pop()
                 if firstInterIter + 1 != iter and inter and Point.isEqual(inter[0], p, tol):
-                    return ConvexPolygon(inter, color=color, sortedList=True)
+                    return ConvexPolygon(beginWithMin(inter, comp), color=color, sortedList=True)
                 else:
                     if not inter:
                         firstInterIter = iter
-
-                    inter.append(p)
+                    if not inter or (inter and not Point.isEqual(inter[0], p, tol)
+                                     and not Point.isEqual(inter[-1], p, tol)):
+                        inter.append(p)
                     if e2.isInLeftHalfPlane(e1.q):
                         place = Place.inPoly1
                     else:
@@ -541,14 +582,18 @@ class ConvexPolygon:
             iter = iter + 1
 
         if inter:
-            return ConvexPolygon(inter, color=color, sortedList=True)
+            return ConvexPolygon(beginWithMin(inter, comp), color=color, sortedList=True)
 
         p1 = poly1.points[0]
         p2 = poly2.points[0]
         if poly2.isPointInside(p1):
-            return copy.deepcopy(poly1)
+            spoly1Copy = copy.deepcopy(poly1)
+            spoly1Copy.color = color
+            return spoly1Copy
         if poly1.isPointInside(p2):
-            return copy.deepcopy(poly2)
+            spoly2Copy = copy.deepcopy(poly2)
+            spoly2Copy.color = color
+            return spoly2Copy
         return emptyPoly
 
     @staticmethod
