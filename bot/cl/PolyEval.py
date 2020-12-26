@@ -45,13 +45,13 @@ class PolyEval(PolyVisitor):
             elif l[1].getSymbol().type == PolyParser.QTEXT:
                 return 'Text: ' + l[1].getText()[1:-1] + '\n'
         elif keyWord == PolyParser.AREA:
-            return '{:.3f}'.format(self.visit(l[1]).getArea()) + '\n'
+            return '{:.3f}'.format(self.visit(l[1]).area()) + '\n'
         elif keyWord == PolyParser.PERIM:
-            return '{:.3f}'.format(self.visit(l[1]).getPerimeter()) + '\n'
+            return '{:.3f}'.format(self.visit(l[1]).perimeter()) + '\n'
         elif keyWord == PolyParser.VERT:
-            return str(self.visit(l[1]).getNumberOfVertices()) + '\n'
+            return str(self.visit(l[1]).numberOfVertices()) + '\n'
         elif keyWord == PolyParser.CENTR:
-            return str(self.visit(l[1]).getCentroid()) + '\n'
+            return str(self.visit(l[1]).centroid()) + '\n'
         elif keyWord == PolyParser.INSIDE:
             poly1 = self.visit(l[1])
             poly2 = self.visit(l[3])
@@ -102,7 +102,7 @@ class PolyEval(PolyVisitor):
             elif keyWord == PolyParser.LPAREN:
                 return self.visit(l[1])
             elif keyWord == PolyParser.BOUND:
-                return self.visit(l[1]).getBoundingBox()
+                return self.visit(l[1]).boundingBox()
             elif keyWord == PolyParser.COPY:
                 return copy.deepcopy(self.polyDict[l[1].getText()])
             elif keyWord == PolyParser.IDEN:

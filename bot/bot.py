@@ -70,7 +70,11 @@ def handleMessage(update, context):
                 photo=open(image, 'rb')
             )
     else:
-        print('User sent:', update.message.text)
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text='There is currently no program running. You might want to start a '
+            'new program using /start. Type /help for more information.'
+        )
 
 
 # Creates objects to work with Telegram
