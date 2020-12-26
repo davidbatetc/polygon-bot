@@ -1,4 +1,3 @@
-// antlr4 -Dlanguage=Python3 -no-listener Poly.g
 // antlr4 -Dlanguage=Python3 -no-listener -visitor Poly.g
 grammar Poly;
 

@@ -408,7 +408,7 @@ class ConvexPolygon:
          than assignments.
         Otherwise, if the constructor is called with sortedList=False, the points
          are used to generate the corresponding convex hull using Graham's scan,
-         which has time complexity O(nlogn) for n = number of points.
+         which has time complexity O(nlogn) where n is the number of points.
         """
         self.color = color
         if sortedList or not points:
@@ -475,7 +475,7 @@ class ConvexPolygon:
         """
         Returns whether a given point is inside the polygon.
 
-        The time complexity of this method is O(log n), where n = number of points.
+        The time complexity of this method is O(log n), where n is the number of vertices.
         """
         n = self.numberOfVertices()
         if n == 0:
