@@ -185,9 +185,10 @@ class Vector:
         """
         Orientation class defined as a simple enum for better readibility.
 
-        Vector.Orien.CCW: Counter-clockwise
-        Vector.Orien.DEGEN: Degenerate
-        Vector.Orien.CW: clockwise
+        Possible values:
+         Vector.Orien.CCW: Counter-clockwise
+         Vector.Orien.DEGEN: Degenerate
+         Vector.Orien.CW: clockwise
         """
         CCW = 1
         DEGEN = 0
@@ -236,9 +237,10 @@ class Edge:
         """
         Intersection class defined as a simple enum for better readibility.
 
-        Edge.Inter.CROSS: Cross intersection. Two edges intersect in an X shape.
-        Edge.Inter.DEGEN: Degenerate intersection. Two edges intersect but are collinear.
-        Edge.Inter.NONE: No intersection between the two edges.
+        Possible values:
+         Edge.Inter.CROSS: Cross intersection. Two edges intersect in an X shape.
+         Edge.Inter.DEGEN: Degenerate intersection. Two edges intersect but are collinear.
+         Edge.Inter.NONE: No intersection between the two edges.
         """
         CROSS = 1
         DEGEN = 0
@@ -384,7 +386,7 @@ class Color:
     def toIntegerTuple(self):
         """
         Converts to an RGB tuple whose values range between 0 and 255
-        (8 bits per color channel).
+         (8 bits per color channel).
         """
         return math.floor(255*self.r), math.floor(255*self.g), math.floor(255*self.b)
 
@@ -521,7 +523,7 @@ class ConvexPolygon:
         Returns whether a given polygon is inside our polygon.
 
         This method has O(n + m) time complexity, where n and m are the number
-        of vertices of the polygons.
+         of vertices of the polygons.
         """
         # Note: This method could also be implemented checking whether each of the
         #  points of the given polygon are inside our polygon with the 'isPointInside'
@@ -548,7 +550,7 @@ class ConvexPolygon:
         Returns whether the polygon is regular or not.
 
         This method works by checking if all the inner angles are the same and the
-        length of all the edges is also the same.
+         length of all the edges is also the same.
         """
         if self.numberOfVertices() <= 2:
             return True
@@ -623,8 +625,8 @@ class ConvexPolygon:
         Returns the convex union of two polygons.
 
         It does so by computing the convex hull of its vertices, which has a
-        O((n + m)log(n + m)) time complexity, where n and m are the number of
-        vertices of the polygons.
+         O((n + m)log(n + m)) time complexity, where n and m are the number of
+         vertices of the polygons.
         """
         return ConvexPolygon(poly1.points + poly2.points, color=color, tol=tol)
 
@@ -659,8 +661,8 @@ class ConvexPolygon:
         Generates a regular polygon with n vertices, radius r and center c.
 
         By default, the righ-most vertex of the polygon will lie on the line
-        {y = c.y}. However, it can be rotated using the phase parameter, which
-        takes an angle in radians.
+         {y = c.y}. However, it can be rotated using the phase parameter, which
+         takes an angle in radians.
         """
         if n == 0:
             return ConvexPolygon([], color=color, sortedList=True)
@@ -708,9 +710,9 @@ class ConvexPolygon:
         Computes the intersection of two given polygons.
 
         The algorithm implemented in this method is adapted from the intersection
-        of convex polygons algorithm described in the paper by O'Rourke, Chien
-        et al. This algorithm has O(n + m) time complexity, where n and m are
-        the number of vertices of the polygons.
+         of convex polygons algorithm described in the paper by O'Rourke, Chien
+         et al. This algorithm has O(n + m) time complexity, where n and m are
+         the number of vertices of the polygons.
         """
 
         # Defined just to make code easier to read
@@ -840,8 +842,8 @@ class ConvexPolygon:
         Draws a list of polygons on a square image.
 
         By default, the file name is 'output.png', the side length of the image
-        is 400, the drawing margin is 1, the background color is white, and the
-        image is not automatically shown in a new window.
+         is 400, the drawing margin is 1, the background color is white, and the
+         image is not automatically shown in a new window.
         """
         img = Image.new('RGB', (sideLength, sideLength), bg.toIntegerTuple())
         dib = ImageDraw.Draw(img)
