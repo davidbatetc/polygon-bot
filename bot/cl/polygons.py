@@ -1,10 +1,12 @@
-import math
-import random
-import copy
 from PIL import Image, ImageDraw
+import copy
+import random
 
 
+import math
 # Zips xs and ys with ys starting by the `shift`-th element
+
+
 def shiftZip(xs, ys, shift):
     return zip(xs, ys[shift:] + ys[0:shift])
 
@@ -195,6 +197,11 @@ class Edge:
     def computeAngle(e1, e2):
         return Vector.computeAngle(e1.q - e1.p, e2.q - e2.p)
 
+    @staticmethod
+    def isEqual(e1, e2, tol=1e-9):
+        return (Point.isEqual(e1.p, e2.p, tol) and Point.isEqual(e1.q, e2.q, tol)) \
+            or (Point.isEqual(e1.p, e2.q, tol) and Point.isEqual(e1.q, e2.p, tol))
+
     # Returns whether two edges intersect
     @staticmethod
     def hasIntersection(e1, e2, tol=1e-9):
@@ -239,7 +246,7 @@ class Edge:
             if comp(ce2.q, ce2.p):
                 ce2.p, ce2.q = ce2.q, ce2.p
             if comp(ce2.p, ce1.p):
-                ce1, ce2 = ce2, ce2
+                ce1, ce2 = ce2, ce1
 
             if comp(ce1.q, ce2.p):
                 return Edge.Inter.DEGEN, []
@@ -360,6 +367,11 @@ class ConvexPolygon:
 
         return binarySlicing(1, n - 1)
 
+    # O(n + m)
+    def isPolygonInside(self, poly, tol=1e-9):
+        inter = ConvexPolygon.intersect(self, poly)
+        return ConvexPolygon.isEqual(inter, poly)
+
     def getEdges(self):
         n = self.getNumberOfVertices()
         if n <= 1:
@@ -425,10 +437,6 @@ class ConvexPolygon:
     @staticmethod
     def convexUnion(poly1, poly2, color=Color(), tol=1e-9):
         return ConvexPolygon(poly1.points + poly2.points, color=color, tol=tol)
-
-    @staticmethod
-    def isContained(poly1, poly2, tol=1e-9):
-        return False  # Tbp
 
     @staticmethod
     def isEqual(poly1, poly2, tol=1e-9):
