@@ -791,8 +791,8 @@ class ConvexPolygon:
                 else:
                     if not inter:
                         firstInterIter = iter
-                    if not inter or (inter and not Point.isEqual(inter[0], p, tol)
-                                     and not Point.isEqual(inter[-1], p, tol)):
+                    if not inter or (inter and not Point.isEqual(inter[0], p, tol) and
+                                     not Point.isEqual(inter[-1], p, tol)):
                         inter.append(p)
                     if e2.isInLeftHalfPlane(e1.q):
                         place = Place.inPoly1
