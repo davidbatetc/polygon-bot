@@ -19,9 +19,12 @@ class PolyEval(PolyVisitor):
         for li in ctx.getChildren():
             outi = self.visit(li)
             imagePrefix = 'Image: '
+            textPrefix = 'Text: '
             if outi != None:
                 if outi.startswith(imagePrefix):
                     imageFileNames.append(outi[len(imagePrefix):-1])
+                elif outi.startswith(textPrefix):
+                    output = output + outi[len(imagePrefix):]
                 else:
                     output = output + outi
         return output, imageFileNames
@@ -38,33 +41,33 @@ class PolyEval(PolyVisitor):
             poly.color = self.visit(l[3])
         elif keyWord == PolyParser.PRINT:
             if type(l[1]) == PolyParser.PolyContext:
-                return 'Polygon: ' + str(self.visit(l[1])) + '\n'
+                return str(self.visit(l[1])) + '\n'
             elif l[1].getSymbol().type == PolyParser.QTEXT:
                 return 'Text: ' + l[1].getText()[1:-1] + '\n'
         elif keyWord == PolyParser.AREA:
-            return 'Area: {:.3f}'.format(self.visit(l[1]).getArea()) + '\n'
+            return '{:.3f}'.format(self.visit(l[1]).getArea()) + '\n'
         elif keyWord == PolyParser.PERIM:
-            return 'Perimeter: {:.3f}'.format(self.visit(l[1]).getPerimeter()) + '\n'
+            return '{:.3f}'.format(self.visit(l[1]).getPerimeter()) + '\n'
         elif keyWord == PolyParser.VERT:
-            return 'Vertices: ' + str(self.visit(l[1]).getNumberOfVertices()) + '\n'
+            return str(self.visit(l[1]).getNumberOfVertices()) + '\n'
         elif keyWord == PolyParser.CENTR:
-            return 'Centroid: ' + str(self.visit(l[1]).getCentroid()) + '\n'
+            return str(self.visit(l[1]).getCentroid()) + '\n'
         elif keyWord == PolyParser.INSIDE:
             poly1 = self.visit(l[1])
             poly2 = self.visit(l[3])
-            yn = ConvexPolygon.isContained(poly1, poly2)
+            yn = poly2.isPolygonInside(poly1)
             if yn:
-                return 'Inside: yes' + '\n'
+                return 'yes' + '\n'
             else:
-                return 'Inside: no' + '\n'
+                return 'no' + '\n'
         elif keyWord == PolyParser.EQUAL:
             poly1 = self.visit(l[1])
             poly2 = self.visit(l[3])
             yn = ConvexPolygon.isEqual(poly1, poly2)
             if yn:
-                return 'Equal: yes' + '\n'
+                return 'yes' + '\n'
             else:
-                return 'Equal: no' + '\n'
+                return 'no' + '\n'
         elif keyWord == PolyParser.DRAW:
             fileName = l[1].getText()[1:-1]
             polys = [self.visit(l[i]) for i in range(3, n, 2)]

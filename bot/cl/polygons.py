@@ -89,7 +89,7 @@ class Point:
 
     # This is the method that the function `print()` uses
     def __repr__(self):
-        return '({:.2f}, {:.2f})'.format(self.x, self.y)
+        return '{:.3f} {:.3f}'.format(self.x, self.y)
 
     def __sub__(self, q):
         return Vector(self.x - q.x, self.y - q.y)
@@ -149,7 +149,7 @@ class Vector:
             self.y = y
 
     def __repr__(self):
-        return '({:.2f}, {:.2f})'.format(self.x, self.y)
+        return '({:.3f}, {:.3f})'.format(self.x, self.y)
 
     def norm(self):
         return math.sqrt(self.x**2 + self.y**2)
@@ -325,7 +325,11 @@ class ConvexPolygon:
 
     # This is the method that the function `print()` uses
     def __repr__(self):
-        return self.points.__repr__()
+        n = self.getNumberOfVertices()
+        if n == 0:
+            return ''
+        else:
+            return str(self.points[0]) + ' ' + ' '.join([str(self.points[i]) for i in range(-1, -n, -1)])
 
     def getNumberOfVertices(self):
         return len(self.points)
