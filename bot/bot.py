@@ -78,7 +78,7 @@ def showSample(update, context):
     if len(context.args) != 1:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text='Only one argument is expected for the /sample command. For example, '
+            text='A single argument is expected for the /sample command. For example, '
             'you can use \"/sample 2\" in order to run the sample program number 2. '
             'Type /help for more information.'
         )

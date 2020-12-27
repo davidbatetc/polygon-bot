@@ -135,6 +135,15 @@ class Point:
         """
         return Point(self.x + u.x, self.y + u.y)
 
+    def rotate(self, angle, c=Point(0, 0)):
+        """
+        Given an angle and a center, rotates the point the given angle around the center.
+
+        Note: this method modifies the point.
+        """
+        self.x = c.x + (self.x - c.x)*math.cos(angle)
+        self.y = c.y + (self.y - c.y)*math.sin(angle)
+
     @staticmethod
     def distance(p, q):
         """Returns the distance between two points."""
@@ -385,8 +394,7 @@ class Color:
 
     def toIntegerTuple(self):
         """
-        Converts to an RGB tuple whose values range between 0 and 255
-         (8 bits per color channel).
+        Converts to an RGB tuple whose values range between 0 and 255.
         """
         return math.floor(255*self.r), math.floor(255*self.g), math.floor(255*self.b)
 
@@ -529,7 +537,7 @@ class ConvexPolygon:
         #  points of the given polygon are inside our polygon with the 'isPointInside'
         #  method, but that would give us O(mlogn) time complexity, which is worse.
         inter = ConvexPolygon.intersect(self, poly)
-        return ConvexPolygon.isEqual(inter, poly)
+        return ConvexPolygon.isEqual(inter, poly, tol)
 
     def edges(self):
         """Returns a list with the edges of the polygon."""
@@ -618,6 +626,16 @@ class ConvexPolygon:
         Note: this method modifies the polygon.
         """
         self.points = [p + u for p in self.points]
+
+    def rotate(self, angle):
+        """
+        Rotates the polygon a given angle around its centroid.
+
+        Note: this method modifies the polygon.
+        """
+        center = self.centroid()
+        for p in self.points:
+            p.rotate(angle, c=center)
 
     @staticmethod
     def convexUnion(poly1, poly2, color=Color(), tol=1e-9):

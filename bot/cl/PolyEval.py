@@ -98,6 +98,10 @@ class PolyEval(PolyVisitor):
             name = l[1].getText()
             u = Vector(float(l[3].getText()), float(l[4].getText()))
             self.polyDict[name].translate(u)
+        elif keyWord == PolyParser.ROTATE:
+            name = l[1].getText()
+            angle = float(l[3].getText())
+            self.polyDict[name].rotate(angle)
 
     def visitPoly(self, ctx: PolyParser.PolyContext):
         """Visits a polygon node of the parse tree and returns the corresponding polygon."""

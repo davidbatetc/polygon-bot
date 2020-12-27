@@ -13,6 +13,7 @@ stmt : IDEN ASSIGN poly
      | EQUAL poly COLON poly
      | DRAW QTEXT (COLON poly)*
      | TRANS IDEN COLON NUM NUM
+     | ROTATE IDEN COLON NUM
      ;
 poly : LSQUARE (NUM NUM)* RSQUARE
      | LPAREN poly RPAREN
@@ -47,6 +48,7 @@ DRAW : 'draw';
 REGPOLY : 'regular';
 COPY : 'copy';
 TRANS : 'translate';
+ROTATE : 'rotate';
 
 // Others
 LPAREN : '(';
