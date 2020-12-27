@@ -1,4 +1,4 @@
 # Polygon bot
 ## To-do
-- [ ] Comment code.
+- [ ] Write sample programs.
 - [ ] Write README.md.

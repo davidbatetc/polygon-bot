@@ -341,8 +341,8 @@ class Edge:
         elif interType == Edge.Inter.DEGEN:
             # Creating deep copies to prevent unexpected behavior in other parts
             #  of the program.
-            ce1 = copy.deepcopy(e1)
-            ce2 = copy.deepcopy(e2)
+            ce1 = copy.copy(e1)
+            ce2 = copy.copy(e2)
 
             # Rearranging so that the points in ce1 and ce2 are sorted, and ce1
             #  is the edge with a smaller p.
@@ -656,7 +656,7 @@ class ConvexPolygon:
          O((n + m)log(n + m)) time complexity, where n and m are the number of
          vertices of the polygons.
         """
-        return ConvexPolygon(copy.deepcopy(poly1.points) + copy.deepcopy(poly2.points),
+        return ConvexPolygon(copy.copy(poly1.points) + copy.copy(poly2.points),
                              color=color, tol=tol)
 
     @staticmethod
@@ -696,7 +696,7 @@ class ConvexPolygon:
         if n == 0:
             return ConvexPolygon([], color=color, sortedList=True)
         if n == 1:
-            return ConvexPolygon([copy.deepcopy(c)], color=color, sortedList=True)
+            return ConvexPolygon([copy.copy(c)], color=color, sortedList=True)
 
         idealShift = (math.pi - phase)*n/(2*math.pi)
         ceilShift = math.ceil(idealShift)
@@ -755,9 +755,8 @@ class ConvexPolygon:
                 return emptyPoly
             if sn1 == 1:
                 if spoly2.isPointInside(spoly1.points[0]):
-                    spoly1Copy = copy.deepcopy(spoly1)
-                    spoly1Copy.color = color
-                    return spoly1Copy
+                    return ConvexPolygon(copy.copy(spoly1.points),
+                                         color=color, sortedList=True)
                 else:
                     return emptyPoly
             if sn1 == 2:
@@ -767,7 +766,7 @@ class ConvexPolygon:
                 if interType == Edge.Inter.NONE:
                     return emptyPoly
                 else:
-                    return ConvexPolygon(copy.deepcopy(ps),
+                    return ConvexPolygon(copy.copy(ps),
                                          color=color, sortedList=True)
 
         n1 = poly1.numberOfVertices()
@@ -828,9 +827,9 @@ class ConvexPolygon:
                         place = Place.inPoly2
 
             if place == Place.inPoly1 and not Point.isEqual(inter[-1], e1.q, tol):
-                inter.append(copy.deepcopy(e1.q))
+                inter.append(copy.copy(e1.q))
             elif place == Place.inPoly2 and not Point.isEqual(inter[-1], e2.q, tol):
-                inter.append(copy.deepcopy(e2.q))
+                inter.append(copy.copy(e2.q))
 
             v1 = Vector(e1.p, e1.q)
             v2 = Vector(e2.p, e2.q)
@@ -854,13 +853,9 @@ class ConvexPolygon:
         p1 = poly1.points[0]
         p2 = poly2.points[0]
         if poly2.isPointInside(p1):
-            spoly1Copy = copy.deepcopy(poly1)
-            spoly1Copy.color = color
-            return spoly1Copy
+            return ConvexPolygon(copy.copy(poly1.points), color=color, sortedList=True)
         if poly1.isPointInside(p2):
-            spoly2Copy = copy.deepcopy(poly2)
-            spoly2Copy.color = color
-            return spoly2Copy
+            return ConvexPolygon(copy.copy(poly2.points), color=color, sortedList=True)
         return emptyPoly
 
     @staticmethod
