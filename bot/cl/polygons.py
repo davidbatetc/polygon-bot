@@ -636,16 +636,19 @@ class ConvexPolygon:
 
         self.points = beginWithMin(self.points, comp=Point.compLexicographic)
 
-    def scale(self, factor):
+    def scale(self, factor, tol=1e-9):
         """
         Scales the polygon with respect to its centroid by given factor.
 
         Note: this method modifies the polygon
         """
         center = self.centroid()
-        for p in self.points:
-            p.x = center.x + (p.x - center.x)*factor
-            p.y = center.y + (p.y - center.y)*factor
+        if eq(factor, 0, tol):
+            self.points = [center]
+        else:
+            for p in self.points:
+                p.x = center.x + (p.x - center.x)*factor
+                p.y = center.y + (p.y - center.y)*factor
 
     @staticmethod
     def convexUnion(poly1, poly2, color=Color(), tol=1e-9):

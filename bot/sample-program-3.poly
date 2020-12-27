@@ -1,1 +1,52 @@
-//
+// Generates two random polygons on [0, 1]x[0, 1] and shows its
+//  intersection and its union. Furthermore, it shows some of its
+//  properties.
+
+// Computes the polygons
+p1 := !8
+p2 := !8
+inter := p1*p2
+union := p1 + p2
+
+// Sets the color for the intersection and the union
+color inter, {1 0 0}
+color union, {0 1 0}
+
+// Showing some of the properties
+print "--- The properties are shown in the order p1, p2, inter and union ---"
+print "The areas are:"
+area p1
+area p2
+area inter
+area union
+print ""
+
+print "The perimeters are:"
+perimeter p1
+perimeter p2
+perimeter inter
+perimeter union
+print ""
+
+print "The number of vertices are:"
+vertices p1
+vertices p2
+vertices inter
+vertices union
+print ""
+
+print "The centroids are:"
+centroid p1
+centroid p2
+centroid inter
+centroid union
+print ""
+
+print "The polygons are:"
+print p1
+print p2
+print inter
+print union
+
+// Draws the polygons
+draw "intersection-and-union.png", p1, p2, inter, union
