@@ -1,0 +1,45 @@
+// Creates a polygon randomly and shows the polygon duplicated following a rainbow color pattern.
+
+// Creates polygons
+p1 := !5
+p2 := copy p1
+scale p2, -1
+p3 := p1*p2
+p4 := copy p3
+p5 := copy p3
+p6 := copy p3
+p7 := copy p3
+p8 := copy p3
+p9 := copy p3
+p10 := copy p3
+
+// Scales the intersections
+scale p4, 0.925
+scale p5, 0.850
+scale p6, 0.775
+scale p7, 0.700
+scale p8, 0.625
+scale p9, 0.550
+scale p10, 0.475
+
+// Translates the intersections
+translate p4, 0 0.144
+translate p5, 0 0.278
+translate p6, 0 0.399
+translate p7, 0 0.510
+translate p8, 0 0.609
+translate p9, 0 0.700
+translate p10, 0 0.774
+
+// Sets the color of some polygons
+color p3, {0 0 1}
+color p4, {1 0 0}
+color p5, {1 0.25 0}
+color p6, {1 0.5 0}
+color p7, {0 1 0}
+color p8, {0 1 0.25}
+color p9, {0 1 1}
+color p10, {0 0.5 1}
+
+// Draws the polygons
+draw "symmetry.png", p3, p4, p5, p6, p7, p8, p9, p10
