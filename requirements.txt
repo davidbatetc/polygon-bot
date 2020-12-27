@@ -1,0 +1,3 @@
+antlr4-python3-runtime  # Python library to work with ANTLR
+pillow                  # Python library for images
+python-telegram-bot     # Python library to handle Telegram bots
