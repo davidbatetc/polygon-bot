@@ -25,28 +25,34 @@ def help(update, context):
     Function that gets executed when /help is called. Sends a message to the
      user with the instructions on how the Telegram bot works.
     """
-    if len(context.args) > 1:
-        pass
-
-    introText = 'I\'ll be happy to help you out! You can use the following commands:' \
-        '\n- Use /start to receive a short presentation about me.' \
-        '\n- Use /help to receive an explanation of how I work.' \
-        '\n- Use /begin to start a new program. If you don\'t know what a program ' \
-        'is, just keep reading and you will find out soon!' \
-        '\n- Use /end to finish a program.' \
-        '\n- Use /sample n to see the source code of the sample program number n ' \
-        'and the output resulting from its execution. This can be a good way to ' \
-        'see what I can do for you.' \
-        '\n- Use /clear to delete the images that you have created from the ' \
-        'computer that is hosting me.' \
-        '\n\nNeed more information? Type /help program in order to see the commands ' \
-        'that you can use in your program.'
-
-    context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=introText,
-        parse_mode=telegram.ParseMode.MARKDOWN
-    )
+    if len(context.args) > 1 or (len(context.args) == 1 and context.args[0] != 'program'):
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text='The /help command expects either "/help" or "/help program". No '
+            'other arguments are accepted. Try again!'
+        )
+    elif len(context.args) == 1:
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text='I\'ll be happy to help you out! You can use the following commands:'
+            '\n- Use /start to receive a short presentation about me.'
+            '\n- Use /help to receive an explanation of how I work.'
+            '\n- Use /begin to start a new program. If you don\'t know what a program '
+            'is, just keep reading and you will find out soon!'
+            '\n- Use /end to finish a program.'
+            '\n- Use /sample n to see the source code of the sample program number n '
+            'and the output resulting from its execution. This can be a good way to '
+            'see what I can do for you.'
+            '\n- Use /clear to delete the images that you have created from the '
+            'computer that is hosting me.'
+            '\n\nNeed more information? Type /help program in order to see the commands '
+            'that you can use in your program.'
+        )
+    else:
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=''
+        )
 
 
 def begin(update, context):
