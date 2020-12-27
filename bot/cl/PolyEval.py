@@ -102,6 +102,10 @@ class PolyEval(PolyVisitor):
             name = l[1].getText()
             angle = float(l[3].getText())
             self.polyDict[name].rotate(angle)
+        elif keyWord == PolyParser.SCALE:
+            name = l[1].getText()
+            factor = float(l[3].getText())
+            self.polyDict[name].scale(factor)
 
     def visitPoly(self, ctx: PolyParser.PolyContext):
         """Visits a polygon node of the parse tree and returns the corresponding polygon."""

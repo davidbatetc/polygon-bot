@@ -1,6 +1,29 @@
-// Sample program that tests rotation
-p := [0 0  1 0  1 1  0 1]
-draw "not-rotated.png", p
+// Sample program that tests scaling
+p1 := regular 7, 1, 1 1, 0
+p2 := copy p1
+p3 := copy p1
+p4 := copy p1
+p5 := copy p1
+p6 := copy p1
+p7 := copy p1
+p8 := copy p1
+p9 := copy p1
+scale p2, 0.9
+scale p3, 0.8
+scale p4, 0.7
+scale p5, 0.6
+scale p6, 0.5
+scale p7, 0.4
+scale p8, 0.3
+scale p9, 0.2
+translate p2, 0 0.05
+translate p3, 0 0.10
+translate p4, 0 0.15
+translate p5, 0 0.20
+translate p6, 0 0.25
+translate p7, 0 0.30
+translate p8, 0 0.35
+translate p9, 0 0.40
 
-rotate p, 0.79  // Rotates p approximately pi/4
-draw "rotated.png", p
+
+draw "nice.png", p1, p2, p3, p4, p5, p6, p7, p8, p9

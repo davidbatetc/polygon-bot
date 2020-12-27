@@ -636,6 +636,17 @@ class ConvexPolygon:
 
         self.points = beginWithMin(self.points, comp=Point.compLexicographic)
 
+    def scale(self, factor):
+        """
+        Scales the polygon with respect to its centroid by given factor.
+
+        Note: this method modifies the polygon
+        """
+        center = self.centroid()
+        for p in self.points:
+            p.x = center.x + (p.x - center.x)*factor
+            p.y = center.y + (p.y - center.y)*factor
+
     @staticmethod
     def convexUnion(poly1, poly2, color=Color(), tol=1e-9):
         """
@@ -645,7 +656,8 @@ class ConvexPolygon:
          O((n + m)log(n + m)) time complexity, where n and m are the number of
          vertices of the polygons.
         """
-        return ConvexPolygon(poly1.points + poly2.points, color=color, tol=tol)
+        return ConvexPolygon(copy.deepcopy(poly1.points) + copy.deepcopy(poly2.points),
+                             color=color, tol=tol)
 
     @staticmethod
     def isEqual(poly1, poly2, tol=1e-9):
@@ -816,9 +828,9 @@ class ConvexPolygon:
                         place = Place.inPoly2
 
             if place == Place.inPoly1 and not Point.isEqual(inter[-1], e1.q, tol):
-                inter.append(e1.q)
+                inter.append(copy.deepcopy(e1.q))
             elif place == Place.inPoly2 and not Point.isEqual(inter[-1], e2.q, tol):
-                inter.append(e2.q)
+                inter.append(copy.deepcopy(e2.q))
 
             v1 = Vector(e1.p, e1.q)
             v2 = Vector(e2.p, e2.q)

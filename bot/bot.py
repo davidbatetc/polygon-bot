@@ -31,27 +31,87 @@ def help(update, context):
             text='The /help command expects either "/help" or "/help program". No '
             'other arguments are accepted. Try again!'
         )
-    elif len(context.args) == 1:
+    elif len(context.args) == 0:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text='I\'ll be happy to help you out! You can use the following commands:'
-            '\n- Use /start to receive a short presentation about me.'
-            '\n- Use /help to receive an explanation of how I work.'
-            '\n- Use /begin to start a new program. If you don\'t know what a program '
-            'is, just keep reading and you will find out soon!'
-            '\n- Use /end to finish a program.'
-            '\n- Use /sample n to see the source code of the sample program number n '
+            text='I\'ll be happy to help you out! You can use the following commands:\n'
+            '- Use /start to receive a short presentation about me.\n'
+            '- Use /help to receive an explanation of how I work.\n'
+            '- Use /begin to start a new program. If you don\'t know what a program '
+            'is, just keep reading and you will find out soon!\n'
+            '- Use /end to finish a program.\n'
+            '- Use /sample n to see the source code of the sample program number n '
             'and the output resulting from its execution. This can be a good way to '
-            'see what I can do for you.'
-            '\n- Use /clear to delete the images that you have created from the '
-            'computer that is hosting me.'
-            '\n\nNeed more information? Type /help program in order to see the commands '
+            'see what I can do for you.\n'
+            '- Use /clear to delete the images that you have created from the '
+            'computer that is hosting me.\n\n'
+            'Need more information? Type "/help program" in order to see the commands '
             'that you can use in your program.'
         )
     else:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=''
+            text='Let me tell you about programs. A new program begins when you send me '
+            'a message with /begin, as long as there is no other program running. In order '
+            'to finish a running program, you just have to send me a message with /end. '
+            'All the messages sent between the message with /begin and the message with /end '
+            'are assumed to be part of the program, and are immediately executed, producing '
+            'the corresponding output. Find below the commands that you can use in the program.\n\n'
+            '*Generating polygons*\n'
+            'There are several ways to generate a convex polygon in the program:\n'
+            '- `[x0 y0  x1 y1  x2 y2  ...]` returns convex polygon obtained by computing '
+            'the convex hull of the given list of points.\n'
+            '- `#p` returns the bounding box of the polygon `p`.\n'
+            '- `p*q` returns the intersection between the polygons `p` and `q`.\n'
+            '- `p + q` returns the convex union between the polygons `p` and `q`, which is '
+            'defined as the convex hull of the vertices of `p` and `q`.\n'
+            '- `copy p` returns a copy of the polygon stored in the variable `p`. Note that '
+            'in this case `p` has to be a variable.\n'
+            '- `regular n, r, cx cy, angle` returns a regular polygon of radius `r` with '
+            '`n` vertices and centered on the point (`cx`, `cy`). `angle` is the angle of rotation '
+            'of the polygon, in radians. If the `angle` is zero, then the right-most vertex '
+            'of the polygon lies on the line {y = `c.y`}.\n'
+            '- `!n` returns a convex polygon obtained by computing the convex hull of a set '
+            'of `n` randomly generated points.\n\n'
+            '*Commands*\n'
+            'In each line of the program, either a command or an empty line is expected. '
+            'Comments, which are explained below, are ignored. The commands that can be '
+            'used are the following:\n'
+            '- `q := p` assigns the polygon `p` to the variable `q`. Note that if `p` is '
+            'a variable, then `q` and `p` will be the same, meaning that any changes '
+            'applied to `p` will affect `q` as well, and viceversa.\n'
+            '- `color p, {r g b}` sets the color of the polygon `p` to the color given '
+            'by the red, green and blue values `r`, `g` and `b` of the RGB color space. '
+            'For each value, a floating point number between `0` and `1` is expected.\n'
+            '- `print p` prints the vertices of the polygon `p` in a new line.\n'
+            '- `print "text"` prints a `text` in a new line.\n'
+            '- `area p` prints the area of the polygon `p` in a new line.\n'
+            '- `perimeter p` prints the perimeter of the polygon `p` in a new line.\n'
+            '- `vert p` prints the number of vertices of the polygon `p` in a new line.\n'
+            '- `centroid p` prints the centroid of the polygon `p` in a new line.\n'
+            '- `inside p, q` prints `yes` if the polygon `p` is inside the polygon `q`, '
+            'and prints `no` otherwise.\n'
+            '- `equal p, q` prints `yes` if the polygon `p` is equal to the polygon `q`, '
+            'and prints `no` otherwise.\n'
+            '- `draw "image.png", p1, p2, p3, ...` creates a 400x400 image with the '
+            'polygons `p1`, `p2`, `p3`, ...\n'
+            '- `translate p, vx vy` translates the polygon `p` by the vector `v = (vx, vy)`. '
+            'Note that in this case `p` has to be a variable.\n'
+            '- `rotate p, alpha` rotates `p` an angle `alpha` around its centroid. '
+            'Note that in this case `p` has to be a variable.\n'
+            '- `scale p, k` scales the polygon `p` with respect to its centroid by a '
+            'factor `k`.\n\n'
+            '*Comments*\n'
+            'Your programs can also include comments. Comments are preceded by `//`. '
+            'Whenever a `//` is found, the following characters are ignored until the '
+            'end of the line.\n\n'
+            '*Final recommendation*\n'
+            'The amount of information in this message might be a bit overwhelming in '
+            'the beginning. For this reason, it is recommended to first run a few '
+            'sample programs in order to see these commands in practice. In order to '
+            'do so, just run "/sample n", with n being the number of the sample program, '
+            'for example, "/sample 2". That\'s all, enjoy!',
+            parse_mode=telegram.ParseMode.MARKDOWN
         )
 
 
@@ -118,7 +178,7 @@ def showSample(update, context):
         context.bot.send_message(
             chat_id=update.effective_chat.id,
             text='A single argument is expected for the /sample command. For example, '
-            'you can use \"/sample 2\" in order to run the sample program number 2. '
+            'you can use "/sample 2" in order to run the sample program number 2. '
             'Type /help for more information.'
         )
         return
@@ -138,12 +198,13 @@ def showSample(update, context):
 
         context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text='Running program \"{:}\". Program source code:'.format(fileName)
+            text='Running program "{:}". Program source code:'.format(fileName)
         )
         if programText:
             context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text=programText
+                text='`' + programText + '`',
+                parse_mode=telegram.ParseMode.MARKDOWN
             )
 
             lexer = PolyLexer(InputStream(programText))
@@ -166,7 +227,8 @@ def showSample(update, context):
         if outputText:
             context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text=outputText
+                text='`' + outputText + '`',
+                parse_mode=telegram.ParseMode.MARKDOWN
             )
 
         if 'imageNames' not in context.chat_data:
@@ -185,7 +247,7 @@ def showSample(update, context):
     else:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text='I attempted to run \"{:}\", but I encountered an error. Try running '
+            text='I attempted to run "{:}", but I encountered an error. Try running '
             'another sample program.'.format(fileName)
         )
 
@@ -208,12 +270,13 @@ def handleProgramContent(update, context):
         lexer = PolyLexer(InputStream(update.message.text))
         parser = PolyParser(CommonTokenStream(lexer))
         tree = parser.root()
-        text, imageNames = context.chat_data['visitor'].visit(tree)
+        outputText, imageNames = context.chat_data['visitor'].visit(tree)
 
-        if text:
+        if outputText:
             context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text=text
+                text='`' + outputText + '`',
+                parse_mode=telegram.ParseMode.MARKDOWN
             )
         if 'imageNames' not in context.chat_data:
             context.chat_data['imageNames'] = set()
@@ -253,11 +316,11 @@ def clear(update, context):
 
         text = ''
         if successfulImageSet:
-            text = text + 'The following images have been deleted: \"' + \
-                '\", \"'.join(successfulImageSet) + "\"\n"
+            text = text + 'The following images have been deleted: "' + \
+                '", "'.join(successfulImageSet) + '"\n'
         if failedImageSet:
-            text = text + 'It was not possible to delete: \"' + \
-                '\", \"'.join(failedImageSet) + "\"\n"
+            text = text + 'It was not possible to delete: "' + \
+                '", "'.join(failedImageSet) + '"\n'
 
         context.chat_data['imageNames'] = set(failedImageSet)
         context.bot.send_message(
