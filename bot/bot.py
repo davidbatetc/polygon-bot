@@ -6,19 +6,52 @@ import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 
+def start(update, context):
+    """
+    Function that gets executed when /start is called. Sends a message to the
+     user in which the bot is presented.
+    """
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text='Hi {:}, @{:} here! I\'m a bot that replies with text messages and images to operations '
+        'related to convex polygons. If this is your first time texting me, you might '
+        'want to use /help to see what I can do for you.'.format(
+            update.effective_chat.first_name, context.bot.username)
+    )
+
+
 def help(update, context):
     """
     Function that gets executed when /help is called. Sends a message to the
      user with the instructions on how the Telegram bot works.
     """
+    if len(context.args) > 1:
+        pass
+
+    introText = 'I\'ll be happy to help you out! You can use the following commands:' \
+        '\n- Use /start to receive a short presentation about me.' \
+        '\n- Use /help to receive an explanation of how I work.' \
+        '\n- Use /begin to start a new program. If you don\'t know what a program ' \
+        'is, just keep reading and you will find out soon!' \
+        '\n- Use /end to finish a program.' \
+        '\n- Use /sample n to see the source code of the sample program number n ' \
+        'and the output resulting from its execution. This can be a good way to ' \
+        'see what I can do for you.' \
+        '\n- Use /clear to delete the images that you have created from the ' \
+        'computer that is hosting me.' \
+        '\n\nNeed more information? Type /help program in order to see the commands ' \
+        'that you can use in your program.'
+
     context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text='There ain\'t much I can help ya with.')
+        text=introText,
+        parse_mode=telegram.ParseMode.MARKDOWN
+    )
 
 
-def start(update, context):
+def begin(update, context):
     """
-    Function that gets executed when /start is called. Begins a new program unless
+    Function that gets executed when /begin is called. Begins a new program unless
      there is a program already running. In that case it sends an error message.
 
     This function sets context.chat_data['isProgramRunning'] to True. Furthermore,
@@ -28,14 +61,14 @@ def start(update, context):
         context.bot.send_message(
             chat_id=update.effective_chat.id,
             text='There is already an ongoing program. Finish that program with /end '
-            'before starting a new program.'
+            'before beginning a new program.'
         )
     else:
         context.chat_data['isProgramRunning'] = True
         context.chat_data['visitor'] = PolyEval()
         context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text='You have started a new program. Text me your program and send a message '
+            text='You have begun a new program. Text me your program and send a message '
             'with /end when you are done. Please note that all the messages that you send '
             'before the message with /end will be interpreted as being part of the program! '
             'If you are a bit lost, you can use /help.'
@@ -61,7 +94,7 @@ def end(update, context):
     else:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text='There is no program running! Use /start to begin a new program.'
+            text='There is no program running! Use /begin to start a new program.'
         )
 
 
@@ -88,7 +121,7 @@ def showSample(update, context):
         context.bot.send_message(
             chat_id=update.effective_chat.id,
             text='There is already an ongoing program. Finish that program with /end '
-            'before starting a new program.'
+            'before beginning a new program.'
         )
         return
 
@@ -158,8 +191,10 @@ def handleProgramContent(update, context):
     This function expects lines of a program. If a program is running, then the
      lines are executed as a part of that program and the resulting output is sent
      as a message, including images. If no program is running, a message suggesting
-     the user to start the program is sent.
+     the user to begin a new program is sent.
     """
+    print('User sent:', update.message.text)
+
     if 'isProgramRunning' not in context.chat_data:
         context.chat_data['isProgramRunning'] = False
 
@@ -186,8 +221,8 @@ def handleProgramContent(update, context):
     else:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text='There is currently no program running. You might want to start a '
-            'new program using /start. Type /help for more information.'
+            text='There is currently no program running. You might want to begin a '
+            'new program using /begin. Type /help for more information.'
         )
 
 
@@ -236,8 +271,9 @@ updater = Updater(token=TOKEN, use_context=True)
 dispatcher = updater.dispatcher
 
 # Add commands to the bot
-dispatcher.add_handler(CommandHandler(command='help', callback=help))
 dispatcher.add_handler(CommandHandler(command='start', callback=start))
+dispatcher.add_handler(CommandHandler(command='help', callback=help))
+dispatcher.add_handler(CommandHandler(command='begin', callback=begin))
 dispatcher.add_handler(CommandHandler(command='end', callback=end))
 dispatcher.add_handler(CommandHandler(command='sample', callback=showSample))
 dispatcher.add_handler(CommandHandler(command='clear', callback=clear))

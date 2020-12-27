@@ -359,7 +359,7 @@ class Edge:
             elif Point.isEqual(ce1.q, ce2.p, tol):
                 return Edge.Inter.DEGEN, [ce1.q]
             else:
-                if compLexicographic(ce1.q, ce2.q):
+                if Point.compLexicographic(ce1.q, ce2.q):
                     return Edge.Inter.DEGEN, [ce2.p, ce1.q]
                 else:
                     return Edge.Inter.DEGEN, [ce2.p, ce2.q]
@@ -428,12 +428,8 @@ class ConvexPolygon:
             self.points = points
             return
 
-        # Returns whether p is strictly lexicographically smaller than q
-        def initialComp(p, q):
-            return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
-
         # Choosing the first vertex of the final list of vertices.
-        p0 = minWithComp(points, comp=initialComp)
+        p0 = minWithComp(points, comp=Point.compLexicographic)
 
         # This is actually the cosine of the angle corresponding to the vectors
         #  u = (1, 0) and v = p - p0. This orders the points with respect to p0
@@ -445,7 +441,7 @@ class ConvexPolygon:
         spoints.sort(key=swipeAngle)
 
         n = len(spoints)
-        stack = []
+        self.points = [p0]
         iter = 0
         while iter < n:
             d = Point.distance(p0, spoints[iter])
@@ -460,13 +456,11 @@ class ConvexPolygon:
                     p = spoints[iter + 1]
                 iter = iter + 1
 
-            while len(stack) >= 2 and Point.orientation(stack[-1], stack[-2], p) != Vector.Orien.CW:
-                stack.pop()  # The pop() method is O(1) for lists in Python.
+            while len(self.points) >= 2 and Point.orientation(self.points[-1], self.points[-2], p) != Vector.Orien.CW:
+                self.points.pop()  # The pop() method is O(1) for lists in Python.
 
-            stack.append(p)
+            self.points.append(p)
             iter = iter + 1
-
-        self.points = [p0] + stack
 
     def __repr__(self):
         """
@@ -808,7 +802,7 @@ class ConvexPolygon:
                 if len(inter) >= 2 and Edge(inter[-2], inter[-1]).isPointInside(p):
                     inter.pop()
                 if firstInterIter + 1 != iter and inter and Point.isEqual(inter[0], p, tol):
-                    return ConvexPolygon(beginWithMin(inter, Point.compLexicographic),
+                    return ConvexPolygon(beginWithMin(inter, comp=Point.compLexicographic),
                                          color=color, sortedList=True)
                 else:
                     if not inter:
@@ -842,7 +836,7 @@ class ConvexPolygon:
             iter = iter + 1
 
         if inter:
-            return ConvexPolygon(beginWithMin(inter, Point.compLexicographic),
+            return ConvexPolygon(beginWithMin(inter, comp=Point.compLexicographic),
                                  color=color, sortedList=True)
 
         p1 = poly1.points[0]
