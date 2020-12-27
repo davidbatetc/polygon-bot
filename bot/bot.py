@@ -201,7 +201,7 @@ def showSample(update, context):
 
     The /sample command takes one parameter, the number of the sample program,
     and when called with '/sample n' it will look for the sample program in the
-    file 'sample-program-n.txt' and produce the corresponding output if it is
+    file 'sample-program-n.poly' and produce the corresponding output if it is
     possible to access it.
     """
     if len(context.args) != 1:
@@ -221,7 +221,7 @@ def showSample(update, context):
         )
         return
 
-    fileName = 'sample-program-{:}.txt'.format(context.args[0])
+    fileName = 'sample-program-{:}.poly'.format(context.args[0])
     if os.path.exists(fileName):
         with open(fileName, 'r') as file:
             programText = file.read()
