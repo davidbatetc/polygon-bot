@@ -101,28 +101,38 @@ def showSample(update, context):
             chat_id=update.effective_chat.id,
             text='Running program \"{:}\". Program source code:'.format(fileName)
         )
-        context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=programText
-        )
+        if programText:
+            context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=programText
+            )
 
-        lexer = PolyLexer(InputStream(programText))
-        parser = PolyParser(CommonTokenStream(lexer))
-        tree = parser.root()
-        outputText, imageNames = PolyEval().visit(tree)
+            lexer = PolyLexer(InputStream(programText))
+            parser = PolyParser(CommonTokenStream(lexer))
+            tree = parser.root()
+            outputText, imageNames = PolyEval().visit(tree)
+
+        else:
+            context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text='Empty file, nothing to be shown.'
+            )
+            outputText, imageNames = '', []
 
         context.bot.send_message(
             chat_id=update.effective_chat.id,
             text='Program output:'
         )
 
+        if outputText:
+            context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=outputText
+            )
+
         if 'imageNames' not in context.chat_data:
             context.chat_data['imageNames'] = set()
 
-        context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=outputText
-        )
         for imageName in imageNames:
             context.chat_data['imageNames'].add(imageName)
             context.bot.send_photo(

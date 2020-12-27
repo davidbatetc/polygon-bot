@@ -135,14 +135,20 @@ class Point:
         """
         return Point(self.x + u.x, self.y + u.y)
 
-    def rotate(self, angle, c=Point(0, 0)):
+    def rotate(self, angle, c):
         """
         Given an angle and a center, rotates the point the given angle around the center.
 
         Note: this method modifies the point.
         """
-        self.x = c.x + (self.x - c.x)*math.cos(angle)
-        self.y = c.y + (self.y - c.y)*math.sin(angle)
+        local = Point(self.x - c.x, self.y - c.y)
+        self.x = c.x + local.x*math.cos(angle) - local.y*math.sin(angle)
+        self.y = c.y + local.x*math.sin(angle) + local.y*math.cos(angle)
+
+    @staticmethod
+    def compLexicographic(p, q, tol=1e-9):
+        """Returns whether p is strictly lexicographically smaller than q."""
+        return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
 
     @staticmethod
     def distance(p, q):
@@ -333,9 +339,6 @@ class Edge:
             return Edge.Inter.NONE, []
 
         elif interType == Edge.Inter.DEGEN:
-            def comp(p, q):
-                return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
-
             # Creating deep copies to prevent unexpected behavior in other parts
             #  of the program.
             ce1 = copy.deepcopy(e1)
@@ -343,20 +346,20 @@ class Edge:
 
             # Rearranging so that the points in ce1 and ce2 are sorted, and ce1
             #  is the edge with a smaller p.
-            if comp(ce1.q, ce1.p):
+            if Point.compLexicographic(ce1.q, ce1.p):
                 ce1.p, ce1.q = ce1.q, ce1.p
-            if comp(ce2.q, ce2.p):
+            if Point.compLexicographic(ce2.q, ce2.p):
                 ce2.p, ce2.q = ce2.q, ce2.p
-            if comp(ce2.p, ce1.p):
+            if Point.compLexicographic(ce2.p, ce1.p):
                 ce1, ce2 = ce2, ce1
 
             # Separing in three cases.
-            if comp(ce1.q, ce2.p):
+            if Point.compLexicographic(ce1.q, ce2.p):
                 return Edge.Inter.DEGEN, []
             elif Point.isEqual(ce1.q, ce2.p, tol):
                 return Edge.Inter.DEGEN, [ce1.q]
             else:
-                if comp(ce1.q, ce2.q):
+                if compLexicographic(ce1.q, ce2.q):
                     return Edge.Inter.DEGEN, [ce2.p, ce1.q]
                 else:
                     return Edge.Inter.DEGEN, [ce2.p, ce2.q]
@@ -637,6 +640,8 @@ class ConvexPolygon:
         for p in self.points:
             p.rotate(angle, c=center)
 
+        self.points = beginWithMin(self.points, comp=Point.compLexicographic)
+
     @staticmethod
     def convexUnion(poly1, poly2, color=Color(), tol=1e-9):
         """
@@ -787,10 +792,6 @@ class ConvexPolygon:
             unknown = 0
             inPoly2 = 1
 
-        # Returns true if p is strictly lexicographically smaller than q
-        def comp(p, q):
-            return lt(p.x, q.x, tol) or (eq(p.x, q.x, tol) and lt(p.y, q.y, tol))
-
         gen1 = cycle(poly1.points)
         gen2 = cycle(poly2.points)
         e1 = Edge(next(gen1), next(gen1))
@@ -807,7 +808,8 @@ class ConvexPolygon:
                 if len(inter) >= 2 and Edge(inter[-2], inter[-1]).isPointInside(p):
                     inter.pop()
                 if firstInterIter + 1 != iter and inter and Point.isEqual(inter[0], p, tol):
-                    return ConvexPolygon(beginWithMin(inter, comp), color=color, sortedList=True)
+                    return ConvexPolygon(beginWithMin(inter, Point.compLexicographic),
+                                         color=color, sortedList=True)
                 else:
                     if not inter:
                         firstInterIter = iter
@@ -840,7 +842,8 @@ class ConvexPolygon:
             iter = iter + 1
 
         if inter:
-            return ConvexPolygon(beginWithMin(inter, comp), color=color, sortedList=True)
+            return ConvexPolygon(beginWithMin(inter, Point.compLexicographic),
+                                 color=color, sortedList=True)
 
         p1 = poly1.points[0]
         p2 = poly2.points[0]

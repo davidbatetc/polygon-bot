@@ -1,0 +1,6 @@
+// Sample program that tests rotation
+p := [0 0  1 0  1 1  0 1]
+draw "not-rotated.png", p
+
+rotate p, 0.79  // Rotates p approximately pi/4
+draw "rotated.png", p
