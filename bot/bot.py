@@ -6,6 +6,32 @@ import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 
+def handlesErrors(f):
+    """
+    A simple function decorator that runs the given function and produces
+    an error message if the function raises an exception.
+
+    Note: this decorator expects the first two arguments of the function
+    to be the 'update' and 'context' arguments corresponding to the Telegram
+    message handlers.
+    """
+    def handler(*args):
+        try:
+            f(*args)
+        except Exception as e:
+            try:
+                update, context = args[0], args[1]  # Defined for better readibility
+                print('Error of type \'{:}\' detected: \'{:}\''.format(type(e).__name__, str(e)))
+                context.bot.send_message(
+                    chat_id=update.effective_chat.id,
+                    text='An error was detected. Please try again.'
+                )
+            except Exception as _:
+                print('It was not possible to inform the user about the error.')
+    return handler
+
+
+@handlesErrors
 def start(update, context):
     """
     Function that gets executed when /start is called. Sends a message to the
@@ -20,6 +46,7 @@ def start(update, context):
     )
 
 
+@handlesErrors
 def help(update, context):
     """
     Function that gets executed when /help is called. Sends a message to the
@@ -115,6 +142,7 @@ def help(update, context):
         )
 
 
+@handlesErrors
 def begin(update, context):
     """
     Function that gets executed when /begin is called. Begins a new program unless
@@ -141,6 +169,7 @@ def begin(update, context):
         )
 
 
+@handlesErrors
 def end(update, context):
     """
     Function that gets executed when /end is called. Ends the running program
@@ -164,6 +193,7 @@ def end(update, context):
         )
 
 
+@handlesErrors
 def showSample(update, context):
     """
     Function that gets executed when /sample is called. It sends the source code
@@ -252,6 +282,7 @@ def showSample(update, context):
         )
 
 
+@handlesErrors
 def handleProgramContent(update, context):
     """
     Function that gets called whenever the user sends a text message.
@@ -261,7 +292,13 @@ def handleProgramContent(update, context):
      as a message, including images. If no program is running, a message suggesting
      the user to begin a new program is sent.
     """
-    print('User sent:', update.message.text)
+    print(
+        'User {:} {:} (@{:}) sent:'.format(
+            update.effective_chat.first_name,
+            update.effective_chat.last_name,
+            update.effective_chat.username),
+        update.message.text
+    )
 
     if 'isProgramRunning' not in context.chat_data:
         context.chat_data['isProgramRunning'] = False
@@ -295,6 +332,7 @@ def handleProgramContent(update, context):
         )
 
 
+@handlesErrors
 def clear(update, context):
     """
     Function that gets executed when /clear is called. Deletes the images that
