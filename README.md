@@ -52,8 +52,9 @@ $ python3 bot.py
 This command will bring our bot to life and we will now be able to interact with it. Once our bot is running, we can send messages to the bot by accessing the link [https://t.me/NameOfOurBot]().
 
 ### First interaction with the bot
-The first message that we should send to the bot is `/start`. When the bot receives this command, it will present itself and it will guide us and help us understanding how it works. The commands `/help` and `/help program` will be especially useful to see what we can do with the bot. For now, we can see the execution of some sample programs using `/sample n`, where `n` is the number of the sample program. For example, running `/sample 4` will give us the corresponding program and the output of the program, which in this case is.
+The first message that we should send to the bot is `/start`. When the bot receives this command, it will present itself and it will guide us and help us understanding how it works. The commands `/help` and `/help program` will be especially useful to see what we can do with the bot. For now, we can see the execution of some sample programs using `/sample n`, where `n` is the number of the sample program. For example, running `/sample 4` will give us the corresponding program and the output of the program, which in this case is
 
+<img src="fancy-pattern.png" width="300"/>
 
 ## Project files
 The files of this project can be split into three kind of files:
