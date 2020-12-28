@@ -13,7 +13,7 @@ def handlesErrors(f):
 
     Note: this decorator expects the first two arguments of the function
     to be the 'update' and 'context' arguments corresponding to the Telegram
-    message handlers.
+    command and message handlers.
     """
     def handler(*args):
         try:

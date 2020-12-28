@@ -88,7 +88,7 @@ The files corresponding to the Telegram bot itself are the ones included in the 
 
 
 ## Programming in the convex polygon language
-When interacting with our Telegram bot, in order for the bot to understand the instructions related to operations with convex polygons, we will need to use the language that this project uses. While most of the available instructions are already explained with detail in [[1]](https://github.com/jordi-petit/lp-polimomis-2020), this project extends the list of commands by adding the following commands:
+When interacting with our Telegram bot, in order for the bot to understand the instructions related to operations with convex polygons, we will need to use the language that this project uses. While most of the available instructions are already explained in detail in [[1]](https://github.com/jordi-petit/lp-polimomis-2020), this project extends the list of commands by adding the following commands:
 - `copy p` returns a copy of the polygon stored in the variable `p`. Note that in this case `p` has to be a variable.
 - `regular n, r, cx cy, alpha` returns a regular polygon of radius `r` with `n` vertices and centered on the point `(cx, cy)`. `alpha` is the angle of rotation of the polygon, in radians. If the angle is zero, then the right-most vertex of the polygon lies on the line {y = `c.y`}.
 - `translate p, vx vy` translates the polygon `p` by the vector `v = (vx, vy)`. Note that in this case `p` has to be a variable.
@@ -118,8 +118,7 @@ For this reason, when testing for equality in the program, `abs(x - y) <= ε` is
 
 
 ### Error handling
-Blablabla
-
+For the most part, in order to simplify the programming, in this project it is assumed that the input given will always be correct. However, so as to prevent the frustration caused by the bot getting stuck due to a typo or another small error such as using `=` instead of `:=`, there is a minimal error handling on the bot side of the program. A decorator that handles these errors has been implemented for Telegram's command and message handlers. This decorator, which is called `handlesErrors` and is defined in the `./bot/bot.py` file, simply transforms the given function into a function that executes its content inside a `try` block and sends an error message to the user if an error is found.
 
 ## References
 - [[1]](https://github.com/jordi-petit/lp-polimomis-2020) [Programming Languages](https://www.fib.upc.edu/en/studies/bachelors-degrees/bachelor-degree-informatics-engineering/curriculum/syllabus/LP) (Fall 2020). [*PolyBot*](https://github.com/jordi-petit/lp-polimomis-2020). [FIB - UPC](https://www.fib.upc.edu/). [Accessed: December 27, 2020]
