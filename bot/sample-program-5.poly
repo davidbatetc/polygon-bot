@@ -42,4 +42,4 @@ color p9, {0 1 1}
 color p10, {0 0.5 1}
 
 // Draws the polygons
-draw "symmetry.png", p3, p4, p5, p6, p7, p8, p9, p10
+draw "rainbow-polygons.png", p3, p4, p5, p6, p7, p8, p9, p10
