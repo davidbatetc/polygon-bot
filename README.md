@@ -2,7 +2,22 @@
 This document describes the [Polygon Bot](https://github.com/jordi-petit/lp-polimomis-2020) project, a Python and ANTLR programming project of the course *Programming Languages* (Fall semester, 2020), which is part of the course offer of the *Facultat d'Informàtica de Barcelona* (FIB - UPC). This project consists of a [Telegram](https://telegram.org/) bot that replies with text messages and images to operations related to convex polygons.
 
 ## Table of contents
-*(to be automatically written)*
+* [Installation](#installation)
+  + [Installing Python and the Python libraries](#installing-python-and-the-python-libraries)
+  + [Installing ANTLR](#installing-antlr)
+* [Getting started](#getting-started)
+  + [Setting up the Telegram bot](#setting-up-the-telegram-bot)
+  + [Running the Telegram bot](#running-the-telegram-bot)
+  + [First interaction with the bot](#first-interaction-with-the-bot)
+* [Project files](#project-files)
+  + [Class for convex polygons](#class-for-convex-polygons)
+  + [Compiler files](#compiler-files)
+  + [Telegram bot files](#telegram-bot-files)
+* [Programming in the convex polygon language](#programming-in-the-convex-polygon-language)
+* [Further comments](#further-comments)
+  + [Comparing floating point values](#comparing-floating-point-values)
+  + [Error handling](#error-handling)
+* [References](#references)
 
 
 ## Installation
