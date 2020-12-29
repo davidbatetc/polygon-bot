@@ -1,4 +1,9 @@
-from cl.polygons import *
+try:
+    from ..polygons import *
+except ValueError as _:
+    import sys
+    sys.path.append("..")
+    from polygons import *
 
 if __name__ is not None and "." in __name__:
     from .PolyParser import PolyParser

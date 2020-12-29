@@ -1,7 +1,15 @@
+try:
+    from ..cl.PolyParser import *
+    from ..cl.PolyLexer import *
+    from ..cl.PolyEval import *
+except ValueError as _:
+    import sys
+    sys.path.append("..")
+    from cl.PolyParser import *
+    from cl.PolyLexer import *
+    from cl.PolyEval import *
+
 import os
-from cl.PolyParser import *
-from cl.PolyLexer import *
-from cl.PolyEval import *
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
