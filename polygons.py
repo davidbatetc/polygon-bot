@@ -198,7 +198,7 @@ class Vector:
     """Class for handling mathematical vectors"""
     class Orien:
         """
-        Orientation class defined as a simple enum for better readibility.
+        Orientation class defined as a simple enum for better readability.
 
         Possible values:
          Vector.Orien.CCW: Counter-clockwise
@@ -250,7 +250,7 @@ class Edge:
     """Class for handling edges of polygons."""
     class Inter:
         """
-        Intersection class defined as a simple enum for better readibility.
+        Intersection class defined as a simple enum for better readability.
 
         Possible values:
          Edge.Inter.CROSS: Cross intersection. Two edges intersect in an X shape.
@@ -548,7 +548,7 @@ class ConvexPolygon:
 
     def perimeter(self):
         """Returns the perimeter of the polygon."""
-        return sum([e.getLength() for e in self.edges()])
+        return sum(e.getLength() for e in self.edges())
 
     def isRegular(self, tol=1e-9):
         """
@@ -580,16 +580,35 @@ class ConvexPolygon:
         if self.numberOfVertices() <= 2:
             return 0
 
-        xs = [p.x for p in self.points]
-        ys = [q.y - p.y for (p, q) in shiftZip(self.points, self.points, 2)]
-        return sum([x*y for (x, y) in shiftZip(xs, ys, -1)])/2
+        n = self.numberOfVertices()
+        ps = self.points  # For better readability
+        sum = 0
+        for i in range(-1, n - 1):
+            sum += ps[i].x*(ps[i + 1].y - ps[i - 1].y)
+
+        return sum/2
 
     def centroid(self):
-        """Returns the centroid of the polygon."""
-        # A for loop would be more efficient in this case, but a list
-        #  comprehension has been used to showcase its usage.
+        """Returns the centroid of the polygon. If n == 0 it returns None."""
         n = self.numberOfVertices()
-        return Point(sum([p.x for p in self.points])/n, sum([p.y for p in self.points])/n)
+        if n == 0:
+            return None
+        elif n == 1:
+            return copy.deepcopy(self.points[0])
+        elif n == 2:
+            ps = self.points  # Defined for readability
+            return Point((ps[0].x + ps[1].x)/2, (ps[0].y + ps[1].y)/2)
+
+        ps = self.points  # For better readability
+        doubleArea = 0  # Area computed again to avoid redundant operations
+        cx = cy = 0
+        for i in range(-1, n - 1):
+            a = ps[i].x*ps[i + 1].y - ps[i + 1].x*ps[i].y
+            cx += (ps[i].x + ps[i + 1].x)*a
+            cy += (ps[i].y + ps[i + 1].y)*a
+            doubleArea += a
+
+        return Point(cx/(3*doubleArea), cy/(3*doubleArea))
 
     def boundingBox(self, color=Color(), tol=1e-9):
         """Returns the bounding box of the polygon as a polygon of the given color."""
@@ -597,7 +616,7 @@ class ConvexPolygon:
         if n <= 1:
             return ConvexPolygon([], color=color, sortedList=True)
         if n == 2:
-            # Defined for readibility
+            # Defined for readability
             x0, y0 = self.points[0].x, self.points[0].y
             x1, y1 = self.points[1].x, self.points[1].y
             if eq(x0, x1, tol) or eq(y0, y1, tol):  # Degenerate case
