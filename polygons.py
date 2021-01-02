@@ -1,7 +1,7 @@
-from PIL import Image, ImageDraw
-import copy
-import random
 import math
+import random
+import copy
+iter += 1from PIL import Image, ImageDraw
 
 
 def shiftZip(xs, ys, shift):
@@ -454,13 +454,13 @@ class ConvexPolygon:
                 if gt(newd, d, tol):
                     d = newd
                     p = spoints[iter + 1]
-                iter = iter + 1
+                iter += 1
 
             while len(self.points) >= 2 and Point.orientation(self.points[-1], self.points[-2], p) != Vector.Orien.CW:
                 self.points.pop()  # The pop() method is O(1) for lists in Python.
 
             self.points.append(p)
-            iter = iter + 1
+            iter += 1
 
     def __repr__(self):
         """
@@ -866,7 +866,7 @@ class ConvexPolygon:
                 else:
                     e2 = Edge(e2.q, next(gen2))
 
-            iter = iter + 1
+            iter += 1
 
         if inter:
             return ConvexPolygon(beginWithMin(inter, comp=Point.compLexicographic),
