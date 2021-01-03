@@ -141,7 +141,7 @@ class PolyLexer(Lexer):
     RSQUARE = 23
     LCURLY = 24
     RCURLY = 25
-    COLON = 26
+    COMMA = 26
     NUM = 27
     IDEN = 28
     WS = 29
@@ -162,14 +162,14 @@ class PolyLexer(Lexer):
             "ASSIGN", "INTER", "UNION", "BOUND", "RAND", "COLOR", "PRINT", 
             "AREA", "PERIM", "VERT", "CENTR", "INSIDE", "EQUAL", "DRAW", 
             "REGPOLY", "COPY", "TRANS", "ROTATE", "SCALE", "LPAREN", "RPAREN", 
-            "LSQUARE", "RSQUARE", "LCURLY", "RCURLY", "COLON", "NUM", "IDEN", 
+            "LSQUARE", "RSQUARE", "LCURLY", "RCURLY", "COMMA", "NUM", "IDEN", 
             "WS", "QTEXT", "COMMENT" ]
 
     ruleNames = [ "ASSIGN", "INTER", "UNION", "BOUND", "RAND", "COLOR", 
                   "PRINT", "AREA", "PERIM", "VERT", "CENTR", "INSIDE", "EQUAL", 
                   "DRAW", "REGPOLY", "COPY", "TRANS", "ROTATE", "SCALE", 
                   "LPAREN", "RPAREN", "LSQUARE", "RSQUARE", "LCURLY", "RCURLY", 
-                  "COLON", "NUM", "IDEN", "WS", "QTEXT", "COMMENT" ]
+                  "COMMA", "NUM", "IDEN", "WS", "QTEXT", "COMMENT" ]
 
     grammarFileName = "Poly.g"
 

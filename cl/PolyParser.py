@@ -76,7 +76,7 @@ class PolyParser ( Parser ):
                       "RAND", "COLOR", "PRINT", "AREA", "PERIM", "VERT", 
                       "CENTR", "INSIDE", "EQUAL", "DRAW", "REGPOLY", "COPY", 
                       "TRANS", "ROTATE", "SCALE", "LPAREN", "RPAREN", "LSQUARE", 
-                      "RSQUARE", "LCURLY", "RCURLY", "COLON", "NUM", "IDEN", 
+                      "RSQUARE", "LCURLY", "RCURLY", "COMMA", "NUM", "IDEN", 
                       "WS", "QTEXT", "COMMENT" ]
 
     RULE_root = 0
@@ -112,7 +112,7 @@ class PolyParser ( Parser ):
     RSQUARE=23
     LCURLY=24
     RCURLY=25
-    COLON=26
+    COMMA=26
     NUM=27
     IDEN=28
     WS=29
@@ -224,11 +224,11 @@ class PolyParser ( Parser ):
         def COLOR(self):
             return self.getToken(PolyParser.COLOR, 0)
 
-        def COLON(self, i:int=None):
+        def COMMA(self, i:int=None):
             if i is None:
-                return self.getTokens(PolyParser.COLON)
+                return self.getTokens(PolyParser.COMMA)
             else:
-                return self.getToken(PolyParser.COLON, i)
+                return self.getToken(PolyParser.COMMA, i)
 
         def color(self):
             return self.getTypedRuleContext(PolyParser.ColorContext,0)
@@ -313,7 +313,7 @@ class PolyParser ( Parser ):
                 self.state = 21
                 self.match(PolyParser.IDEN)
                 self.state = 22
-                self.match(PolyParser.COLON)
+                self.match(PolyParser.COMMA)
                 self.state = 23
                 self.color()
                 pass
@@ -371,7 +371,7 @@ class PolyParser ( Parser ):
                 self.state = 38
                 self.poly(0)
                 self.state = 39
-                self.match(PolyParser.COLON)
+                self.match(PolyParser.COMMA)
                 self.state = 40
                 self.poly(0)
                 pass
@@ -382,7 +382,7 @@ class PolyParser ( Parser ):
                 self.state = 43
                 self.poly(0)
                 self.state = 44
-                self.match(PolyParser.COLON)
+                self.match(PolyParser.COMMA)
                 self.state = 45
                 self.poly(0)
                 pass
@@ -395,9 +395,9 @@ class PolyParser ( Parser ):
                 self.state = 53
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while _la==PolyParser.COLON:
+                while _la==PolyParser.COMMA:
                     self.state = 49
-                    self.match(PolyParser.COLON)
+                    self.match(PolyParser.COMMA)
                     self.state = 50
                     self.poly(0)
                     self.state = 55
@@ -412,7 +412,7 @@ class PolyParser ( Parser ):
                 self.state = 57
                 self.match(PolyParser.IDEN)
                 self.state = 58
-                self.match(PolyParser.COLON)
+                self.match(PolyParser.COMMA)
                 self.state = 59
                 self.match(PolyParser.NUM)
                 self.state = 60
@@ -425,7 +425,7 @@ class PolyParser ( Parser ):
                 self.state = 62
                 self.match(PolyParser.IDEN)
                 self.state = 63
-                self.match(PolyParser.COLON)
+                self.match(PolyParser.COMMA)
                 self.state = 64
                 self.match(PolyParser.NUM)
                 pass
@@ -436,7 +436,7 @@ class PolyParser ( Parser ):
                 self.state = 66
                 self.match(PolyParser.IDEN)
                 self.state = 67
-                self.match(PolyParser.COLON)
+                self.match(PolyParser.COMMA)
                 self.state = 68
                 self.match(PolyParser.NUM)
                 pass
@@ -495,11 +495,11 @@ class PolyParser ( Parser ):
         def REGPOLY(self):
             return self.getToken(PolyParser.REGPOLY, 0)
 
-        def COLON(self, i:int=None):
+        def COMMA(self, i:int=None):
             if i is None:
-                return self.getTokens(PolyParser.COLON)
+                return self.getTokens(PolyParser.COMMA)
             else:
-                return self.getToken(PolyParser.COLON, i)
+                return self.getToken(PolyParser.COMMA, i)
 
         def RAND(self):
             return self.getToken(PolyParser.RAND, 0)
@@ -582,17 +582,17 @@ class PolyParser ( Parser ):
                 self.state = 91
                 self.match(PolyParser.NUM)
                 self.state = 92
-                self.match(PolyParser.COLON)
+                self.match(PolyParser.COMMA)
                 self.state = 93
                 self.match(PolyParser.NUM)
                 self.state = 94
-                self.match(PolyParser.COLON)
+                self.match(PolyParser.COMMA)
                 self.state = 95
                 self.match(PolyParser.NUM)
                 self.state = 96
                 self.match(PolyParser.NUM)
                 self.state = 97
-                self.match(PolyParser.COLON)
+                self.match(PolyParser.COMMA)
                 self.state = 98
                 self.match(PolyParser.NUM)
                 pass

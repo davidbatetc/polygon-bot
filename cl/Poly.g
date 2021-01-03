@@ -3,18 +3,18 @@ grammar Poly;
 
 root : (COMMENT | stmt)* EOF;
 stmt : IDEN ASSIGN poly
-     | COLOR IDEN COLON color
+     | COLOR IDEN COMMA color
      | PRINT (poly | QTEXT)
      | AREA poly
      | PERIM poly
      | VERT poly
      | CENTR poly
-     | INSIDE poly COLON poly
-     | EQUAL poly COLON poly
-     | DRAW QTEXT (COLON poly)*
-     | TRANS IDEN COLON NUM NUM
-     | ROTATE IDEN COLON NUM
-     | SCALE IDEN COLON NUM
+     | INSIDE poly COMMA poly
+     | EQUAL poly COMMA poly
+     | DRAW QTEXT (COMMA poly)*
+     | TRANS IDEN COMMA NUM NUM
+     | ROTATE IDEN COMMA NUM
+     | SCALE IDEN COMMA NUM
      ;
 poly : LSQUARE (NUM NUM)* RSQUARE
      | LPAREN poly RPAREN
@@ -23,7 +23,7 @@ poly : LSQUARE (NUM NUM)* RSQUARE
      | poly UNION poly
      | COPY IDEN
      | IDEN
-     | REGPOLY NUM COLON NUM COLON NUM NUM COLON NUM
+     | REGPOLY NUM COMMA NUM COMMA NUM NUM COMMA NUM
      | RAND NUM
      ;
 color : LCURLY NUM NUM NUM RCURLY;
@@ -59,7 +59,7 @@ LSQUARE : '[';
 RSQUARE : ']';
 LCURLY : '{';
 RCURLY : '}';
-COLON : ',';
+COMMA : ',';
 NUM : ('+' | '-')?([0-9]+ | [0-9]+'.'[0-9]+);
 IDEN : [a-zA-Z][a-zA-Z0-9]*;
 WS : [ \t\n]+ -> skip;
