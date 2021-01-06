@@ -129,7 +129,7 @@ whereas
 True
 ```
 
-For this reason, when testing for equality in the program, `abs(x - y) <= ε` is preferred over `x == y`, where `ε` is a given tolerance (for example `ε = 1e-9`). Analogously, `x - y < ε` is preferred over `x <= y`, and so on. The functions `eq`, `ge`, `le`, `gt` and `lt` are defined in `polygons.py` for this purpose.
+For this reason, when testing for equality in the program, `abs(x - y) <= ε` is preferred over `x == y`, where `ε` is a given tolerance (for example `ε = 1e-9`). Analogously, `x - y < ε` is preferred over `x <= y`, and so on. The functions `eq`, `ne`, `ge`, `le`, `gt` and `lt` are defined in `polygons.py` for this purpose.
 
 
 ### Error handling
