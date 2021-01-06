@@ -737,7 +737,7 @@ class ConvexPolygon:
         """
         Computes the boundaries of a list of polygons.
 
-        In other words, it returns the left-most, bottom.most, right-most and
+        In other words, it returns the left-most, bottom-most, right-most and
          top-most coordinates of the vertices of the given polygons.
 
         Note: If the list is empty or only has 0-gons, then it returns left = math.inf,

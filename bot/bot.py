@@ -105,7 +105,7 @@ def help(update, context):
             '- `regular n, r, cx cy, alpha` returns a regular polygon of radius `r` with '
             '`n` vertices and centered on the point (`cx`, `cy`). `alpha` is the angle of rotation '
             'of the polygon, in radians. If the `alpha` is zero, then the right-most vertex '
-            'of the polygon lies on the line {y = `c.y`}.\n'
+            'of the polygon lies on the line {y = `cy`}.\n'
             '- `!n` returns a convex polygon obtained by computing the convex hull of a set '
             'of `n` randomly generated points.\n\n'
             '*Commands*\n'
