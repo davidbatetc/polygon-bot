@@ -46,47 +46,47 @@ scale p19, 0.10
 scale p20, 0.05
 
 // The same with rotation
-rotate p2, 0.050
-rotate p3, 0.075
-rotate p4, 0.100
-rotate p5, 0.125
-rotate p6, 0.150
-rotate p7, 0.175
-rotate p8, 0.200
-rotate p9, 0.225
-rotate p10, 0.250
-rotate p11, 0.275
-rotate p12, 0.300
-rotate p13, 0.325
-rotate p14, 0.350
-rotate p15, 0.375
-rotate p16, 0.400
-rotate p17, 0.425
-rotate p18, 0.450
-rotate p19, 0.475
-rotate p20, 0.500
+rotate p2, 0.025
+rotate p3, 0.050
+rotate p4, 0.075
+rotate p5, 0.100
+rotate p6, 0.125
+rotate p7, 0.150
+rotate p8, 0.175
+rotate p9, 0.200
+rotate p10, 0.225
+rotate p11, 0.250
+rotate p12, 0.275
+rotate p13, 0.300
+rotate p14, 0.325
+rotate p15, 0.350
+rotate p16, 0.375
+rotate p17, 0.400
+rotate p18, 0.425
+rotate p19, 0.450
+rotate p20, 0.475
 
 // Changing the colors for a better effect
-color p1, {0.12 0 0.07}
-color p2, {0.12 0 0.07}
-color p3, {0.20 0 0.23}
-color p4, {0.20 0 0.23}
-color p5, {0.28 0 0.39}
-color p6, {0.28 0 0.39}
-color p7, {0.36 0 0.55}
-color p8, {0.36 0 0.55}
-color p9, {0.44 0 0.71}
-color p10, {0.44 0 0.71}
-color p11, {0.52 0 0.87}
-color p12, {0.52 0 0.87}
-color p13, {0.60 0 1}
-color p14, {0.60 0 1}
-color p15, {0.68 0 1}
-color p16, {0.68 0 1}
-color p17, {0.76 0 1}
-color p18, {0.76 0 1}
-color p19, {0.84 0 1}
-color p20, {0.84 0 1}
+color p1, {0.08 0 0.16}
+color p2, {0.08 0 0.16}
+color p3, {0.16 0 0.32}
+color p4, {0.16 0 0.32}
+color p5, {0.24 0 0.48}
+color p6, {0.24 0 0.48}
+color p7, {0.32 0 0.64}
+color p8, {0.32 0 0.64}
+color p9, {0.40 0 0.80}
+color p10, {0.40 0 0.80}
+color p11, {0.48 0 0.96}
+color p12, {0.48 0 0.96}
+color p13, {0.56 0 1}
+color p14, {0.56 0 1}
+color p15, {0.64 0 1}
+color p16, {0.64 0 1}
+color p17, {0.72 0 1}
+color p18, {0.72 0 1}
+color p19, {0.80 0 1}
+color p20, {0.80 0 1}
 
 // Draw the result
-draw "fancy-pattern.png", p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20
+draw "fancy-pattern.png", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20

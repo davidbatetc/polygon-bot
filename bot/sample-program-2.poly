@@ -1,6 +1,6 @@
 // Draws four randomly generated polygons with its bounding box.
 
-// Defines three random polygons by computing the convex hull of 4, 5, 6 and 7
+// Defines four random polygons by computing the convex hull of 4, 5, 6 and 7
 //  randomly generated points on [0, 1]x[0, 1], respectively.
 p1 := !4
 p2 := !5
@@ -19,7 +19,7 @@ translate p2, -0.25 0.25
 translate p3, 0.25 0.25
 translate p4, 0.25 -0.25
 
-// Compute the bounding box of the four polygons and change its color
+// Computes the bounding box of the four polygons and change its color
 bbox := #(p1 + p2 + p3 + p4)
 color bbox, {1 0 0}
 

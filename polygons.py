@@ -1,7 +1,8 @@
 import math
 import random
 import copy
-iter += 1from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw
+from functools import reduce
 
 
 def shiftZip(xs, ys, shift):
@@ -934,3 +935,93 @@ class ConvexPolygon:
             img.show()
 
         img.save(fileName)
+
+
+if __name__ == '__main__':
+    """Some test cases to show how the ConvexPolygon class can be used."""
+
+    def test1():
+        """Generates four random polygons and draws them and their bounding box."""
+
+        # Defines four random polygons by computing the convex hull of 4, 5, 6 and 7
+        #  randomly generated points on [0, 1]x[0, 1], respectively.
+        poly1 = ConvexPolygon.random(4)
+        poly2 = ConvexPolygon.random(5)
+        poly3 = ConvexPolygon.random(6)
+        poly4 = ConvexPolygon.random(7)
+
+        # Sets the color of the polygons. The numbers in Color(...) correspond to the
+        #  values r, g and b of the RGB color space, where r, g, b € [0, 1].
+        poly1.color = Color(r=0.020, g=0.678, b=0.294)
+        poly2.color = Color(r=0.020, g=0.616, b=0.678)
+        poly3.color = Color(r=0.318, g=0.020, b=0.678)
+        poly4.color = Color(r=0.020, g=0.239, b=0.678)
+
+        # Translates the polygons by the given vectors
+        poly1.translate(Vector(-0.25, -0.25))
+        poly2.translate(Vector(-0.25, 0.25))
+        poly3.translate(Vector(0.25, 0.25))
+        poly4.translate(Vector(0.25, -0.25))
+
+        # Computes the bounding box of the four polygons and change its color
+        polys = [poly1, poly2, poly3, poly4]
+        bbox = ConvexPolygon.boundingBox(
+            reduce(lambda p, q: ConvexPolygon.convexUnion(p, q), polys))
+        bbox.color = Color(r=1, g=0, b=0)
+        polys.append(bbox)
+
+        # Draws the result. Notice that show=True will show the result in a new
+        #  window. By default show=False.
+        ConvexPolygon.draw(polys, fileName='bounded-polys.png', show=True)
+
+    def test2():
+        """
+        Generates two random polygons and draws them along with their union and
+        intersection. Furthermore it shows some of its properties.
+        """
+        # Generates two random polygons by computing the convex hull of 8 randomly
+        #  generated points on [0, 1]x[0, 1].
+        poly1 = ConvexPolygon.random(8)
+        poly2 = ConvexPolygon.random(8)
+
+        # Computes intersection and (convex) union.
+        inter = ConvexPolygon.intersect(poly1, poly2, color=Color(1, 0, 0))
+        union = ConvexPolygon.convexUnion(poly1, poly2, color=Color(0, 1, 0))
+
+        # Creates a list with all the polygons
+        polys = [poly1, poly2, inter, union]
+
+        # Showing some properties
+        def showProperty(property):
+            print('Showing ', property, ':', sep='', end=' ')
+            for poly in polys:
+                print(getattr(poly, property)(), sep='', end=', ')
+            print()
+
+        print('--- The properties are shown in the order p1, p2, inter and union ---')
+        showProperty('area')
+        showProperty('perimeter')
+        showProperty('numberOfVertices')
+        showProperty('centroid')
+        print('Showing polygons:', polys)
+
+        # Draws the polygons
+        ConvexPolygon.draw(polys, fileName='inter-union.png', show=True)
+
+    def test3():
+        """Draws a fancy spinning triangle pattern."""
+
+        polys = []
+        for i in range(0, 20):
+            radius = 1 - 0.05*i
+            phase = 0.025*i
+            color = Color(r=0.08*i, g=0, b=min(1, 0.16*i))
+            poly = ConvexPolygon.genRegularPolygon(
+                n=3, r=radius, c=Point(1, 1), phase=phase, color=color)
+            polys.append(poly)
+
+        ConvexPolygon.draw(polys, fileName='cool-pattern.png', show=True)
+
+    test1()
+    test2()
+    test3()
